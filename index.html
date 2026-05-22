@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Virtual Labs - Jacobian - LAUC</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;}
+body{background:#f8f9fa;color:#333;line-height:1.6;}
+.container{max-width:1200px;margin:0 auto;padding:0 20px;}
+
+/* ── HEADER ── */
+header{background:linear-gradient(135deg,#2c3e50,#1a2530);color:white;padding:15px 0;box-shadow:0 4px 12px rgba(0,0,0,0.1);position:sticky;top:0;z-index:200;}
+.header-container{display:flex;justify-content:space-between;align-items:center;}
+.logo-section{display:flex;align-items:center;gap:25px;}
+.pcce-logo-container{display:flex;align-items:center;gap:15px;padding-right:25px;border-right:2px solid rgba(255,255,255,0.2);}
+.pcce-logo-img{width:60px;height:60px;object-fit:contain;border-radius:8px;background:white;padding:5px;box-shadow:0 4px 8px rgba(0,0,0,0.2);}
+.pcce-logo-text .main{font-size:18px;font-weight:700;line-height:1.2;}
+.pcce-logo-text .sub{font-size:11px;opacity:0.9;margin-top:2px;}
+.virtual-labs-logo{display:flex;align-items:center;gap:12px;}
+.virtual-labs-logo i{font-size:28px;color:#3498db;}
+.virtual-labs-logo h1{font-size:22px;font-weight:600;}
+.virtual-labs-logo span{color:#3498db;}
+.header-right{display:flex;align-items:center;gap:10px;position:relative;}
+.auth-btn{padding:7px 16px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;border:none;}
+.btn-login{background:transparent;border:1.5px solid rgba(255,255,255,0.5);color:white;}
+.btn-login:hover{background:rgba(255,255,255,0.1);}
+.btn-signup{background:#3498db;color:white;}
+.btn-signup:hover{background:#2c80b9;}
+.user-chip{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.1);padding:6px 14px;border-radius:24px;cursor:pointer;transition:background 0.2s;}
+.user-chip:hover{background:rgba(255,255,255,0.18);}
+.user-avatar{width:30px;height:30px;border-radius:50%;background:#3498db;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+.user-chip .uname{font-size:13px;font-weight:500;}
+.user-dropdown{position:absolute;top:calc(100% + 10px);right:0;background:white;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,0.15);padding:8px 0;min-width:190px;display:none;z-index:300;}
+.user-dropdown.open{display:block;}
+.user-dropdown a{display:flex;align-items:center;gap:10px;padding:10px 18px;color:#333;text-decoration:none;font-size:14px;cursor:pointer;transition:background 0.15s;}
+.user-dropdown a:hover{background:#f0f7ff;}
+.user-dropdown a i{color:#3498db;width:16px;}
+.user-dropdown hr{border:none;border-top:1px solid #eee;margin:4px 0;}
+.user-dropdown .logout{color:#e74c3c;}
+.user-dropdown .logout i{color:#e74c3c;}
+
+/* ── HOME GRID ── */
+.home-page{padding:36px 0 60px;}
+.home-title{margin-bottom:28px;}
+.home-title h2{font-size:24px;color:#2c3e50;font-weight:700;margin-bottom:4px;}
+.home-title p{color:#7f8c8d;font-size:14px;}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:18px;}
+.home-card{background:white;border-radius:12px;padding:26px 18px;text-align:center;cursor:pointer;
+  box-shadow:0 2px 10px rgba(0,0,0,0.06);border:2px solid transparent;transition:all 0.25s;}
+.home-card:hover{transform:translateY(-5px);box-shadow:0 10px 28px rgba(0,0,0,0.12);border-color:#3498db;}
+.home-card .card-icon{width:58px;height:58px;border-radius:14px;background:linear-gradient(135deg,#3498db,#2c80b9);
+  margin:0 auto 14px;display:flex;align-items:center;justify-content:center;}
+.home-card .card-icon i{font-size:24px;color:white;}
+.home-card h3{font-size:15px;color:#2c3e50;margin-bottom:5px;font-weight:600;}
+.home-card p{font-size:12px;color:#7f8c8d;}
+.card-status{margin-top:10px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;display:inline-block;}
+.status-done{background:#d4edda;color:#155724;}
+.status-visited{background:#fff3cd;color:#856404;}
+.status-not{background:#f0f4f8;color:#7f8c8d;}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(13,27,42,0.72);z-index:500;display:none;
+  align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto;}
+.modal-overlay.open{display:flex;}
+.modal-box{background:white;border-radius:14px;width:100%;max-width:860px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.25);animation:modalIn 0.3s ease;margin:auto;}
+@keyframes modalIn{from{opacity:0;transform:translateY(-24px)}to{opacity:1;transform:translateY(0)}}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:18px 26px;
+  border-bottom:1px solid #eee;position:sticky;top:0;background:white;border-radius:14px 14px 0 0;z-index:10;}
+.modal-header h2{font-size:18px;color:#2c3e50;display:flex;align-items:center;gap:10px;}
+.modal-header h2 i{color:#3498db;}
+.back-home-btn{display:flex;align-items:center;gap:8px;padding:8px 16px;background:#f0f4f8;border:none;
+  border-radius:8px;cursor:pointer;font-size:13px;color:#555;font-weight:600;transition:all 0.2s;}
+.back-home-btn:hover{background:#e0e7ef;color:#2c3e50;}
+.modal-body{padding:26px;}
+
+/* ── AUTH MODAL ── */
+.auth-modal-box{background:white;border-radius:14px;width:100%;max-width:420px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.25);animation:modalIn 0.3s ease;margin:auto;}
+.auth-tabs{display:flex;gap:4px;background:#f0f4f8;border-radius:8px;padding:4px;margin-bottom:22px;}
+.auth-tab{flex:1;padding:9px;text-align:center;border-radius:6px;cursor:pointer;font-size:14px;font-weight:600;color:#7f8c8d;transition:all 0.2s;}
+.auth-tab.active{background:white;color:#2c3e50;box-shadow:0 2px 6px rgba(0,0,0,0.08);}
+.auth-form{display:none;}
+.auth-form.active{display:block;}
+.form-field{margin-bottom:15px;}
+.form-field label{display:block;font-size:13px;font-weight:600;color:#555;margin-bottom:5px;}
+.form-field input{width:100%;padding:10px 14px;border:1.5px solid #dde3ea;border-radius:8px;font-size:14px;transition:border 0.2s;outline:none;}
+.form-field input:focus{border-color:#3498db;box-shadow:0 0 0 3px rgba(52,152,219,0.1);}
+.form-error{color:#e74c3c;font-size:12px;margin-top:4px;display:none;}
+.auth-submit{width:100%;padding:11px;background:linear-gradient(to right,#3498db,#2c80b9);color:white;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px;}
+.auth-submit:hover{transform:translateY(-1px);box-shadow:0 5px 15px rgba(52,152,219,0.3);}
+.auth-switch{text-align:center;margin-top:14px;font-size:13px;color:#7f8c8d;}
+.auth-switch a{color:#3498db;cursor:pointer;font-weight:600;}
+
+/* ── DASHBOARD ── */
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;}
+.dash-card{background:#f8f9fa;border-radius:10px;padding:18px;}
+.dash-card h4{font-size:13px;font-weight:700;color:#7f8c8d;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;display:flex;align-items:center;gap:7px;}
+.dash-card h4 i{color:#3498db;}
+.score-big{font-size:38px;font-weight:800;color:#3498db;line-height:1;}
+.score-label{font-size:12px;color:#7f8c8d;margin-top:3px;}
+.prog-bar{margin-top:12px;background:#e0e7ef;border-radius:4px;height:8px;overflow:hidden;}
+.prog-bar-fill{height:8px;background:#3498db;border-radius:4px;transition:width 0.6s;}
+.score-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.score-box{background:white;border-radius:8px;padding:14px;text-align:center;border:1.5px solid #eee;}
+.score-box .val{font-size:22px;font-weight:700;}
+.score-box .lbl{font-size:11px;color:#7f8c8d;margin-top:3px;}
+.score-box.blue .val{color:#3498db;}
+.score-box.green .val{color:#27ae60;}
+.progress-list{list-style:none;}
+.progress-list li{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid #eee;font-size:14px;}
+.progress-list li:last-child{border-bottom:none;}
+.pill{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+.pill-done{background:#d4edda;color:#155724;}
+.pill-visited{background:#fff3cd;color:#856404;}
+.pill-not{background:#f0f4f8;color:#7f8c8d;}
+
+/* ── SECTION CONTENT STYLES ── */
+.aim-box{background:#f0f7ff;border-left:5px solid #3498db;border-radius:8px;padding:22px;margin-bottom:18px;}
+.aim-box h3{color:#2c3e50;font-size:19px;margin-bottom:10px;}
+.aim-box p,.aim-box li{color:#444;line-height:1.8;}
+.aim-box ul{margin-left:20px;margin-top:8px;}
+.theory-block{margin-bottom:26px;}
+.theory-block h3{color:#2c3e50;font-size:17px;margin-bottom:10px;border-left:4px solid #3498db;padding-left:12px;}
+.theory-block p{color:#444;line-height:1.8;margin-bottom:8px;}
+.formula-box{background:#1a2530;color:#3dd68c;font-family:'Courier New',monospace;padding:16px 22px;border-radius:8px;font-size:15px;margin:14px 0;white-space:pre-wrap;}
+.formula-box.small{font-size:13px;padding:12px 18px;}
+.highlight-box{background:#fff8e6;border:1.5px solid #f39c12;border-radius:8px;padding:14px 18px;margin:12px 0;}
+.highlight-box p{color:#7a5c00;margin:0;}
+.step-box{background:#f0f7ff;border-radius:8px;padding:14px 18px;margin:8px 0;border-left:4px solid #3498db;}
+.step-box .step-num{font-size:11px;font-weight:700;color:#3498db;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;}
+.step-box p{margin:0;color:#333;}
+.check-badge{display:inline-block;background:#d4edda;color:#155724;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;margin-top:5px;}
+.degree-examples{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0;}
+.deg-item{background:#f8f9fa;border-radius:6px;padding:12px;text-align:center;}
+.deg-item .term{font-family:monospace;font-size:14px;color:#2c3e50;font-weight:600;}
+.deg-item .deg{font-size:11px;color:#7f8c8d;margin-top:3px;}
+.summary-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;}
+.summary-table th{background:#2c3e50;color:white;padding:9px 13px;text-align:left;}
+.summary-table td{padding:9px 13px;border-bottom:1px solid #eee;color:#333;}
+.summary-table tr:nth-child(even) td{background:#f8f9fa;}
+.summary-table code{background:#1a2530;color:#3dd68c;padding:2px 7px;border-radius:4px;font-size:11px;}
+.case-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-top:14px;}
+.case-card{background:#f8f9fa;border-radius:8px;padding:14px;border-top:3px solid #3498db;}
+.case-card h4{color:#2c3e50;margin-bottom:6px;font-size:14px;}
+.case-card p{font-size:13px;color:#555;}
+.case-card .formula{font-family:monospace;color:#2c80b9;font-size:13px;margin-top:5px;}
+.theory-divider{border:none;border-top:2px dashed #eee;margin:26px 0;}
+.marking-scheme-box{background:#f0f7ff;border:1.5px solid #3498db;border-radius:10px;padding:18px 22px;margin-bottom:20px;}
+.marking-scheme-box h3{color:#2c3e50;font-size:16px;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.marking-scheme-box h3 i{color:#3498db;}
+.mark-rule{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid #d5e8f5;}
+.mark-rule:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.mark-badge{flex-shrink:0;min-width:52px;text-align:center;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;}
+.mark-badge.green{background:#d4edda;color:#155724;}
+.mark-badge.orange{background:#fff3cd;color:#856404;}
+.mark-badge.red{background:#f8d7da;color:#721c24;}
+.mark-rule p{font-size:13px;color:#444;margin:0;}
+.quiz-score{background:#e8f4fc;border:1px solid #b8d4f0;border-radius:8px;padding:14px 18px;margin-bottom:18px;font-size:15px;color:#2c3e50;}
+.quiz-question{background:#f8f9fa;border-radius:8px;padding:20px;margin-bottom:18px;border-left:5px solid #3498db;animation:fadeIn 0.3s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.quiz-question p.q-text{font-size:15px;color:#2c3e50;margin-bottom:14px;font-weight:500;}
+.attempt-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.attempt-dots{display:flex;gap:6px;align-items:center;}
+.attempt-dot{width:10px;height:10px;border-radius:50%;background:#bdc3c7;transition:background 0.3s;}
+.attempt-dot.used{background:#e74c3c;}
+.attempt-dot.current{background:#f39c12;}
+.attempt-label{font-size:12px;color:#7f8c8d;}
+.quiz-options{list-style:none;display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
+.quiz-options li label{display:flex;align-items:center;gap:10px;cursor:pointer;padding:9px 14px;border-radius:6px;border:1px solid #ddd;background:white;transition:all 0.2s;font-size:14px;}
+.quiz-options li label:hover{background:#e8f4fc;border-color:#3498db;}
+.quiz-options input[type=radio]{accent-color:#3498db;width:15px;height:15px;}
+.quiz-options li.correct label{background:#d4edda;border-color:#27ae60;color:#155724;font-weight:600;}
+.quiz-options li.wrong label{background:#f8d7da;border-color:#e74c3c;color:#721c24;}
+.quiz-options li.reveal label{background:#d4edda;border-color:#27ae60;color:#155724;}
+.q-feedback{margin-top:10px;padding:10px 14px;border-radius:8px;font-weight:500;display:none;font-size:13px;}
+.q-feedback.correct{background:#d4edda;color:#155724;border:1px solid #c3e6cb;}
+.q-feedback.wrong{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;}
+.q-feedback.info{background:#fff3cd;color:#856404;border:1px solid #ffeeba;}
+.q-feedback.neutral{background:#f0f4f8;color:#555;border:1px solid #ccc;}
+.hint-prompt-box{background:#fffbf0;border:1.5px solid #f39c12;border-radius:8px;padding:12px 16px;margin-top:10px;display:none;}
+.hint-prompt-box p{font-size:13px;color:#7a5c00;margin-bottom:10px;}
+.hint-prompt-box .hbtn-row{display:flex;gap:8px;}
+.hint-yes{padding:7px 16px;border-radius:6px;border:none;background:#f39c12;color:white;font-size:13px;font-weight:600;cursor:pointer;}
+.hint-yes:hover{background:#d68910;}
+.hint-no{padding:7px 16px;border-radius:6px;border:1px solid #ddd;background:#ecf0f1;color:#555;font-size:13px;font-weight:600;cursor:pointer;}
+.hint-content-box{background:#fffbf0;border:1.5px solid #f39c12;border-radius:8px;padding:12px 16px;margin-top:8px;display:none;}
+.hint-content-box h5{color:#9a6b00;font-size:13px;margin-bottom:5px;display:flex;align-items:center;gap:6px;}
+.hint-content-box p{font-size:13px;color:#7a5c00;}
+.hint-content-box .hf{margin-top:7px;background:#fef3cd;border-radius:5px;padding:5px 10px;font-family:monospace;font-size:12px;color:#5d4200;}
+.sim-wrap{display:flex;flex-direction:column;gap:18px;}
+.sim-controls{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.sim-field label{display:block;font-size:13px;color:#7f8c8d;margin-bottom:5px;font-weight:500;}
+.sim-field input{width:100%;padding:9px 13px;border:1px solid #ddd;border-radius:6px;font-size:14px;color:#2c3e50;background:#f8f9fa;}
+.sim-field input:focus{outline:none;border-color:#3498db;background:white;}
+.sim-hint{font-size:11px;color:#aaa;margin-top:3px;}
+.var-toggle{display:flex;gap:8px;margin-bottom:14px;}
+.vt-btn{padding:6px 16px;border-radius:6px;border:1px solid #ddd;background:#f8f9fa;font-size:13px;cursor:pointer;color:#555;transition:all 0.2s;}
+.vt-btn.active{background:#e8f4fc;border-color:#3498db;color:#2c80b9;font-weight:500;}
+.sim-btn{background:linear-gradient(to right,#3498db,#2c80b9);color:white;border:none;padding:10px 26px;font-size:15px;border-radius:6px;cursor:pointer;transition:all 0.3s;font-weight:500;margin-top:4px;display:inline-flex;align-items:center;gap:8px;}
+.sim-btn:hover{transform:translateY(-2px);box-shadow:0 5px 15px rgba(52,152,219,0.3);}
+.result-box{border-radius:8px;padding:20px;border:1px solid #d1e7ff;background:#e8f4fc;display:none;margin-top:14px;}
+.result-box.success{border-color:#28a745;background:#f0fff4;}
+.result-box.error{border-color:#dc3545;background:#fff5f5;}
+.step-item{margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid rgba(0,0,0,0.06);}
+.step-item:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.step-label{font-size:11px;font-weight:700;color:#7f8c8d;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:5px;}
+.step-val{font-size:14px;color:#2c3e50;line-height:1.7;}
+.step-val code{background:#1a2530;color:#3dd68c;padding:2px 7px;border-radius:4px;font-size:12px;font-family:'Courier New',monospace;}
+.badge-ok{display:inline-block;background:#d4edda;color:#155724;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;}
+.badge-fail{display:inline-block;background:#f8d7da;color:#721c24;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;}
+.badge-info{display:inline-block;background:#cce5ff;color:#004085;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;}
+.examples-row{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px;}
+.examples-row span{font-size:12px;color:#7f8c8d;align-self:center;}
+.ex-btn{font-size:11px;padding:4px 10px;border:1px solid #ddd;border-radius:20px;background:white;color:#555;cursor:pointer;font-family:'Courier New',monospace;transition:all 0.2s;}
+.ex-btn:hover{background:#e8f4fc;border-color:#3498db;color:#2c80b9;}
+.ref-list{list-style:none;}
+.ref-list li{padding:14px 16px;border-bottom:1px solid #eee;display:flex;align-items:flex-start;gap:14px;}
+.ref-list li:last-child{border-bottom:none;}
+.ref-list li i{color:#3498db;font-size:18px;margin-top:2px;flex-shrink:0;}
+.ref-list li a{color:#3498db;text-decoration:none;}
+.ref-list li a:hover{text-decoration:underline;}
+.contrib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:18px;}
+.contrib-card{background:#f8f9fa;border-radius:10px;padding:18px;text-align:center;}
+.contrib-avatar{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#3498db,#2c3e50);margin:0 auto 10px;display:flex;align-items:center;justify-content:center;color:white;font-size:20px;font-weight:700;}
+.contrib-card h4{color:#2c3e50;margin-bottom:4px;font-size:15px;}
+.contrib-card p{font-size:12px;color:#7f8c8d;}
+.feedback-form{max-width:580px;}
+.fb-field{margin-bottom:16px;}
+.fb-field label{display:block;font-size:14px;font-weight:500;color:#2c3e50;margin-bottom:5px;}
+.fb-field input,.fb-field textarea,.fb-field select{width:100%;padding:9px 13px;border:1px solid #ddd;border-radius:6px;font-size:14px;font-family:inherit;}
+.fb-field textarea{height:90px;resize:vertical;}
+.star-row{display:flex;gap:8px;font-size:26px;cursor:pointer;}
+.star{color:#ddd;transition:color 0.15s;}
+.star.lit{color:#f39c12;}
+.fb-submit{background:linear-gradient(to right,#3498db,#2c80b9);color:white;border:none;padding:11px 26px;font-size:15px;border-radius:6px;cursor:pointer;transition:all 0.3s;font-weight:500;}
+.fb-submit:hover{transform:translateY(-2px);box-shadow:0 5px 15px rgba(52,152,219,0.3);}
+.fb-success{display:none;background:#d4edda;color:#155724;padding:14px 18px;border-radius:8px;margin-top:14px;font-weight:500;}
+footer{margin-top:40px;padding:18px 0;text-align:center;color:#7f8c8d;font-size:13px;border-top:1px solid #eee;}
+.footer-logo{font-weight:bold;color:#2c3e50;}
+@media(max-width:768px){
+  .header-container{flex-wrap:wrap;gap:10px;}
+  .pcce-logo-container{border-right:none;padding-right:0;border-bottom:1px solid rgba(255,255,255,0.2);padding-bottom:10px;width:100%;}
+  .virtual-labs-logo{justify-content:center;}
+  .cards-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));}
+  .dash-grid{grid-template-columns:1fr;}
+  .sim-controls{grid-template-columns:1fr;}
+  .degree-examples{grid-template-columns:1fr 1fr;}
+  .modal-overlay{padding:8px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<header>
+  <div class="container header-container">
+    <div class="logo-section">
+      <div class="pcce-logo-container">
+        <img src="https://raw.githubusercontent.com/dineshkute90/virtual_lab_LAUC/main/pccoe.png"
+          alt="PCOE Logo" class="pcce-logo-img"
+          onerror="this.onerror=null;this.src='https://via.placeholder.com/60x60/2c3e50/ffffff?text=PCOE';">
+        <div class="pcce-logo-text">
+          <div class="main">APPLIED SCIENCES &amp; HUMANITIES</div>
+          <div class="sub">Pimpri Chinchwad College of Engineering</div>
+        </div>
+      </div>
+      <div class="virtual-labs-logo">
+        <span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor"><path d="M288 0H160a16 16 0 0 0-16 16v192L7 361.9C-8 379.7-2.3 408 20 415.9l408 80c22.3 7.9 43-14.2 34-36.2L304 192V16a16 16 0 0 0-16-16zM176 16h96v32h-96zm0 64h96v32h-96zm155.4 377.9L137.7 432l74-149.4c.4-.9.6-1.7.6-2.6V48h64v232c0 .9.2 1.8.6 2.6z"/></svg></span></i>
+        <h1>Virtual <span>Labs</span></h1>
+      </div>
+    </div>
+    <div class="header-right" id="headerRight"></div>
+  </div>
+</header>
+
+<!-- ═══ HOME ═══ -->
+<div class="container home-page" id="homePage">
+  <div class="home-title">
+    <h2><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;color:#3498db;margin-right:10px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor"><path d="M288 0H160a16 16 0 0 0-16 16v192L7 361.9C-8 379.7-2.3 408 20 415.9l408 80c22.3 7.9 43-14.2 34-36.2L304 192V16a16 16 0 0 0-16-16zM176 16h96v32h-96zm0 64h96v32h-96zm155.4 377.9L137.7 432l74-149.4c.4-.9.6-1.7.6-2.6V48h64v232c0 .9.2 1.8.6 2.6z"/></svg></span></i>Jacobian — Virtual Lab</h2>
+    <p>Engineering Mathematics · Homogeneous Functions · PCCE &nbsp;|&nbsp; Tap any card to open</p>
+  </div>
+  <div class="cards-grid">
+    <div class="home-card" onclick="openSection('aim')">
+      <div class="card-icon"><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-400a144 144 0 1 1 0 288 144 144 0 1 1 0-288zm0 64a80 80 0 1 0 0 160A80 80 0 1 0 256 176zm0 48a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/></svg></span></i></div>
+      <h3>Aim</h3><p>Objective of the experiment</p>
+      <span class="card-status status-not" id="st-aim">Not Started</span>
+    </div>
+    <div class="home-card" onclick="openSection('theory')">
+      <div class="card-icon"><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor"><path d="M96 0C43 0 0 43 0 96V416c0 53 43 96 96 96H384h32c17.7 0 32-14.3 32-32s-14.3-32-32-32V384c17.7 0 32-14.3 32-32V32c0-17.7-14.3-32-32-32H384 96zm0 384H352v64H96c-17.7 0-32-14.3-32-32s14.3-32 32-32zm32-240c0-8.8 7.2-16 16-16H336c8.8 0 16 7.2 16 16s-7.2 16-16 16H144c-8.8 0-16-7.2-16-16zm16 48H336c8.8 0 16 7.2 16 16s-7.2 16-16 16H144c-8.8 0-16-7.2-16-16s7.2-16 16-16z"/></svg></span></i></div>
+      <h3>Theory</h3><p>Background concepts &amp; formulas</p>
+      <span class="card-status status-not" id="st-theory">Not Started</span>
+    </div>
+    <div class="home-card" onclick="openSection('pretest')">
+      <div class="card-icon"><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM169.8 165.3c7.9-22.3 29.1-37.3 52.8-37.3h58.3c34.9 0 63.1 28.3 63.1 63.1 0 22.6-12.1 43.5-31.7 54.8L280 264.4c-.2 13-10.9 23.6-24 23.6c-13.3 0-24-10.7-24-24V250.5c0-8.6 4.6-16.5 12.1-20.8l44.3-25.4c4.7-2.7 7.6-7.7 7.6-13.1 0-8.4-6.8-15.1-15.1-15.1H222.6c-3.4 0-6.4 2.1-7.5 5.3l-.4 1.2c-4.4 12.5-18.2 19-30.6 14.6s-19-18.2-14.6-30.6l.4-1.2zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"/></svg></span></i></div>
+      <h3>Pretest</h3><p>Pre-experiment assessment</p>
+      <span class="card-status status-not" id="st-pretest">Not Started</span>
+    </div>
+    <div class="home-card" onclick="openSection('simulation')">
+      <div class="card-icon"><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" fill="currentColor"><path d="M64 0C28.7 0 0 28.7 0 64V352c0 35.3 28.7 64 64 64H240l-10.7 32H160c-17.7 0-32 14.3-32 32s14.3 32 32 32H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H346.7L336 416H512c35.3 0 64-28.7 64-64V64c0-35.3-28.7-64-64-64H64zM512 64V352H64V64H512z"/></svg></span></i></div>
+      <h3>Simulation</h3><p>Interactive theorem verifier</p>
+      <span class="card-status status-not" id="st-simulation">Not Started</span>
+    </div>
+    <div class="home-card" onclick="openSection('posttest')">
+      <div class="card-icon"><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" fill="currentColor"><path d="M192 0c-41.8 0-77.4 26.7-90.5 64H64C28.7 64 0 92.7 0 128V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V128c0-35.3-28.7-64-64-64H282.5C269.4 26.7 233.8 0 192 0zm0 64a32 32 0 1 1 0 64 32 32 0 1 1 0-64zM305 273L177 401c-9.4 9.4-24.6 9.4-33.9 0L79 337c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L271 239c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"/></svg></span></i></div>
+      <h3>Posttest</h3><p>Post-experiment assessment</p>
+      <span class="card-status status-not" id="st-posttest">Not Started</span>
+    </div>
+    <div class="home-card" onclick="openSection('references')">
+      <div class="card-icon"><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" fill="currentColor"><path d="M249.6 471.5c10.8 3.8 22.4-4.1 22.4-15.5V78.6c0-4.2-1.6-8.4-5-11C247.4 52 202.4 32 144 32C93.5 32 46.3 45.3 18.1 56.1C6.8 60.5 0 71.7 0 83.8V454.1c0 11.9 12.8 20.2 24.1 16.5C55.6 460.1 105.5 448 144 448c33.9 0 79 14 105.6 23.5zm76.8 0C353 462 398.1 448 432 448c38.5 0 88.4 12.1 119.9 22.6c11.3 3.8 24.1-4.6 24.1-16.5V83.8c0-12.1-6.8-23.3-18.1-27.6C529.7 45.3 482.5 32 432 32c-58.4 0-103.4 20-123 45.6c-3.3 2.6-5 6.8-5 11V456c0 11.4 11.7 19.3 22.4 15.5z"/></svg></span></i></div>
+      <h3>References</h3><p>Further reading</p>
+      <span class="card-status status-not" id="st-references">Not Started</span>
+    </div>
+    <div class="home-card" onclick="openSection('contributors')">
+      <div class="card-icon"><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" fill="currentColor"><path d="M144 160A80 80 0 1 0 144 0a80 80 0 1 0 0 160zm368 0A80 80 0 1 0 512 0a80 80 0 1 0 0 160zM0 298.7C0 310.4 9.6 320 21.3 320H234.7c.2 0 .4 0 .7 0c-26.6-23.5-43.3-57.8-43.3-96c0-7.6 .7-15 1.9-22.3c-13.6-6.3-28.7-9.7-44.6-9.7H106.7C47.8 192 0 239.8 0 298.7zM320 320c24 0 45.9-8.8 62.7-23.3c21.9-18.9 35.3-46.3 35.3-76.7c0-55.9-43.4-101.3-97.1-103.9c-1.9-.1-3.9-.1-5.8-.1C259.4 116 208 167.4 208 231.1C208 280.1 237.7 322.4 280 337.5C292.3 342.1 306 344 320 344c0 0 0 0 0-24zM405.3 320c-.2 0-.4 0-.7 0H405.3zM447.3 192H416c-15.9 0-31 3.4-44.6 9.7c1.3 7.2 1.9 14.7 1.9 22.3c0 38.2-16.8 72.5-43.3 96c.2 0 .4 0 .7 0H618.7c11.8 0 21.3-9.6 21.3-21.3C640 239.8 592.2 192 533.3 192H447.3zM255.4 337.5c-3.8-1.3-7.4-2.8-11-4.5C248.8 334.3 252 335.9 255.4 337.5zM224 480c0 17.7 14.3 32 32 32H384c17.7 0 32-14.3 32-32V416c0-53-43-96-96-96s-96 43-96 96v64z"/></svg></span></i></div>
+      <h3>Contributors</h3><p>Meet the team</p>
+      <span class="card-status status-not" id="st-contributors">Not Started</span>
+    </div>
+    <div class="home-card" onclick="openSection('feedback')">
+      <div class="card-icon"><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M160 368c26.5 0 48 21.5 48 48v16l72.5-54.4c8.3-6.2 18.4-9.6 28.8-9.6H448c8.8 0 16-7.2 16-16V64c0-8.8-7.2-16-16-16H64c-8.8 0-16 7.2-16 16V352c0 8.8 7.2 16 16 16h96zm48 124l-.2 .2-5.1 3.8-17.1 12.8c-4.8 3.6-11.3 4.2-16.8 1.5s-8.8-8.2-8.8-14.3V474.7v-6.4V468v-4c0-6 .3-11.9 .8-17.8H64c-35.3 0-64-28.7-64-64V64C0 28.7 28.7 0 64 0H448c35.3 0 64 28.7 64 64V352c0 35.3-28.7 64-64 64H309.3L208 492z"/></svg></span></i></div>
+      <h3>Feedback</h3><p>Share your experience</p>
+      <span class="card-status status-not" id="st-feedback">Not Started</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SECTION MODAL ═══ -->
+<div class="modal-overlay" id="sectionModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 id="modalTitle"><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-400a144 144 0 1 1 0 288 144 144 0 1 1 0-288zm0 64a80 80 0 1 0 0 160A80 80 0 1 0 256 176zm0 48a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/></svg></span></i> Aim</h2>
+      <button class="back-home-btn" onclick="closeSection()">
+        <span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor"><path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.2 288 416 288c17.7 0 32-14.3 32-32s-14.3-32-32-32l-306.7 0L214.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span></i> Back to Home
+      </button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- ═══ AUTH MODAL ═══ -->
+<div class="modal-overlay" id="authModal">
+  <div class="auth-modal-box">
+    <div class="modal-header">
+      <h2><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M399 384.2C376.9 345.8 335.4 320 288 320H224c-47.4 0-88.9 25.8-111 64.2c35.2 39.2 86.2 63.8 143 63.8s107.8-24.7 143-63.8zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256 16a72 72 0 1 0 0-144 72 72 0 1 0 0 144z"/></svg></span></i> Student Account</h2>
+      <button class="back-home-btn" onclick="closeAuth()" style="padding:6px 12px;">
+        <span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" fill="currentColor"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg></span></i>
+      </button>
+    </div>
+    <div style="padding:22px;">
+      <div class="auth-tabs">
+        <div class="auth-tab active" id="tab-login" onclick="switchTab('login')">Sign In</div>
+        <div class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Sign Up</div>
+      </div>
+      <div class="auth-form active" id="form-login">
+        <div class="form-field">
+          <label>Roll Number</label>
+          <input type="text" id="login-id" placeholder="e.g. 22CS101">
+        </div>
+        <div class="form-field">
+          <label>Password</label>
+          <input type="password" id="login-pass" placeholder="Enter password">
+          <div class="form-error" id="login-err">Incorrect roll number or password.</div>
+        </div>
+        <button class="auth-submit" onclick="doLogin()"><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M352 96l64 0c17.7 0 32 14.3 32 32l0 256c0 17.7-14.3 32-32 32l-64 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l64 0c53 0 96-43 96-96l0-256c0-53-43-96-96-96l-64 0c-17.7 0-32 14.3-32 32s14.3 32 32 32zm-9.4 182.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L242.7 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l210.7 0-73.4 73.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l128-128z"/></svg></span></i> &nbsp;Sign In</button>
+        <div class="auth-switch">No account? <a onclick="switchTab('signup')">Sign Up</a></div>
+      </div>
+      <div class="auth-form" id="form-signup">
+        <div class="form-field">
+          <label>Full Name</label>
+          <input type="text" id="su-name" placeholder="Your full name">
+          <div class="form-error" id="su-name-err">Please enter your name.</div>
+        </div>
+        <div class="form-field">
+          <label>Roll Number</label>
+          <input type="text" id="su-roll" placeholder="e.g. 22CS101">
+          <div class="form-error" id="su-roll-err">Please enter your roll number.</div>
+        </div>
+        <div class="form-field">
+          <label>Password</label>
+          <input type="password" id="su-pass" placeholder="Min 6 characters">
+          <div class="form-error" id="su-pass-err">Password must be at least 6 characters.</div>
+        </div>
+        <div class="form-field">
+          <label>Confirm Password</label>
+          <input type="password" id="su-pass2" placeholder="Re-enter password">
+          <div class="form-error" id="su-pass2-err">Passwords do not match.</div>
+        </div>
+        <button class="auth-submit" onclick="doSignup()"><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" fill="currentColor"><path d="M96 128a128 128 0 1 1 256 0A128 128 0 1 1 96 128zM0 482.3C0 383.8 79.8 304 178.3 304h91.4C368.2 304 448 383.8 448 482.3c0 16.4-13.3 29.7-29.7 29.7H29.7C13.3 512 0 498.7 0 482.3zM504 312V248H440c-13.3 0-24-10.7-24-24s10.7-24 24-24h64V136c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24H552v64c0 13.3-10.7 24-24 24s-24-10.7-24-24z"/></svg></span></i> &nbsp;Create Account</button>
+        <div class="auth-switch">Have an account? <a onclick="switchTab('login')">Sign In</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ DASHBOARD MODAL ═══ -->
+<div class="modal-overlay" id="dashModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M32 32c17.7 0 32 14.3 32 32V400c0 8.8 7.2 16 16 16H480c17.7 0 32 14.3 32 32s-14.3 32-32 32H80c-44.2 0-80-35.8-80-80V64C0 46.3 14.3 32 32 32zm96 96c0-17.7 14.3-32 32-32l192 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-192 0c-17.7 0-32-14.3-32-32zm32 64H288c17.7 0 32 14.3 32 32s-14.3 32-32 32H160c-17.7 0-32-14.3-32-32s14.3-32 32-32zm0 96h96c17.7 0 32 14.3 32 32s-14.3 32-32 32H160c-17.7 0-32-14.3-32-32s14.3-32 32-32z"/></svg></span></i> My Dashboard</h2>
+      <button class="back-home-btn" onclick="document.getElementById('dashModal').classList.remove('open')" style="padding:6px 12px;">
+        <span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" fill="currentColor"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg></span></i>
+      </button>
+    </div>
+    <div class="modal-body" id="dashBody"></div>
+  </div>
+</div>
+
+<footer class="container">
+  <p>Virtual Labs &copy; 2025 &nbsp;|&nbsp; Applied Sciences &amp; Humanities Department &nbsp;|&nbsp;
+    <span class="footer-logo">Pimpri Chinchwad College of Engineering</span>
+  </p>
+</footer>
+
+<!-- ══════════ CONTENT TEMPLATES ══════════ -->
+<template id="tpl-aim">
+<div class="aim-box">
+  <h3><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;color:#3498db;margin-right:10px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-400a144 144 0 1 1 0 288 144 144 0 1 1 0-288zm0 64a80 80 0 1 0 0 160A80 80 0 1 0 256 176zm0 48a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/></svg></span>Aim of the Experiment</h3>
+  <p>To understand, compute, and apply the concept of <strong>Jacobian of a Transformation</strong> for functions of two and three variables, and to explore its role in coordinate transformations and change-of-variables in integration.</p>
+  <ul>
+    <li>Understand the definition and physical meaning of the Jacobian determinant.</li>
+    <li>Compute J = ∂(u,v)/∂(x,y) using the 2×2 partial derivative matrix.</li>
+    <li>Compute J = ∂(u,v,w)/∂(x,y,z) using the 3×3 partial derivative matrix.</li>
+    <li>Verify the inverse property: J × J' = 1 (where J' is the Jacobian of the inverse transformation).</li>
+    <li>Apply Jacobians to Polar, Cylindrical, and Spherical coordinate systems.</li>
+    <li>Use the Jacobian for change of variables in double and triple integrals.</li>
+  </ul>
+</div>
+</template>
+
+<template id="tpl-theory">
+<div class="theory-block">
+  <h3>1. What is a Jacobian?</h3>
+  <p>The <strong>Jacobian</strong> is the determinant of the matrix of all first-order partial derivatives of a vector-valued function. It measures how a transformation stretches, shrinks, or rotates area or volume at each point.</p>
+  <div class="highlight-box"><p><strong>Intuition:</strong> If u and v are functions of x and y, the Jacobian tells us how much a small patch of area in the xy-plane gets scaled when mapped to the uv-plane.</p></div>
+</div>
+<hr class="theory-divider">
+<div class="theory-block">
+  <h3>2. Jacobian for Two Variables</h3>
+  <p>If u = f(x, y) and v = g(x, y), the Jacobian of (u, v) with respect to (x, y) is:</p>
+  <div class="formula-box">J = ∂(u,v)     | ∂u/∂x  ∂u/∂y |
+    ─────────── = |               |
+    ∂(x,y)      | ∂v/∂x  ∂v/∂y |
+
+  = (∂u/∂x)(∂v/∂y) − (∂u/∂y)(∂v/∂x)</div>
+  <div class="highlight-box"><p>The Jacobian is also written as <strong>J(u,v/x,y)</strong>. It is a single scalar value — the determinant of the 2×2 partial derivative matrix.</p></div>
+</div>
+<hr class="theory-divider">
+<div class="theory-block">
+  <h3>3. Step-by-Step Example (2 Variables)</h3>
+  <p><strong>Given:</strong> u = x² − y², &nbsp; v = 2xy. Find J = ∂(u,v)/∂(x,y).</p>
+  <div class="step-box"><div class="step-num">Step 1 — Find all partial derivatives</div><p>∂u/∂x = 2x &nbsp;&nbsp; ∂u/∂y = −2y &nbsp;&nbsp; ∂v/∂x = 2y &nbsp;&nbsp; ∂v/∂y = 2x</p></div>
+  <div class="step-box"><div class="step-num">Step 2 — Form the 2×2 determinant</div><p>J = (∂u/∂x)(∂v/∂y) − (∂u/∂y)(∂v/∂x) = (2x)(2x) − (−2y)(2y)</p></div>
+  <div class="step-box"><div class="step-num">Step 3 — Simplify</div><p>J = 4x² + 4y² = 4(x² + y²) <span class="check-badge">✔ Computed</span></p></div>
+</div>
+<hr class="theory-divider">
+<div class="theory-block">
+  <h3>4. Jacobian for Three Variables</h3>
+  <p>If u, v, w are functions of x, y, z, the Jacobian is the <strong>3×3 determinant</strong>:</p>
+  <div class="formula-box">J = ∂(u,v,w)   | ∂u/∂x  ∂u/∂y  ∂u/∂z |
+    ─────────── = | ∂v/∂x  ∂v/∂y  ∂v/∂z |
+    ∂(x,y,z)    | ∂w/∂x  ∂w/∂y  ∂w/∂z |</div>
+</div>
+<hr class="theory-divider">
+<div class="theory-block">
+  <h3>5. Inverse Jacobian Property</h3>
+  <p>If J = ∂(u,v)/∂(x,y) and J' = ∂(x,y)/∂(u,v), then:</p>
+  <div class="formula-box">J × J' = 1  &nbsp;(provided J ≠ 0)</div>
+  <div class="step-box"><div class="step-num">Verification Example — Polar Coordinates</div>
+    <p>Forward: x = r·cosθ, y = r·sinθ &nbsp;→&nbsp; J = r<br>
+    Inverse: r = √(x²+y²), θ = arctan(y/x) &nbsp;→&nbsp; J' = 1/r<br>
+    J × J' = r × (1/r) = 1 ✓</p>
+  </div>
+</div>
+<hr class="theory-divider">
+<div class="theory-block">
+  <h3>6. Standard Coordinate Transformations</h3>
+  <div class="case-grid">
+    <div class="case-card"><h4>Polar</h4><p>x = r·cosθ, y = r·sinθ</p><div class="formula">J = r</div></div>
+    <div class="case-card"><h4>Cylindrical</h4><p>x=r·cosθ, y=r·sinθ, z=z</p><div class="formula">J = r</div></div>
+    <div class="case-card"><h4>Spherical</h4><p>x=ρsinφcosθ, y=ρsinφsinθ, z=ρcosφ</p><div class="formula">J = ρ²·sinφ</div></div>
+    <div class="case-card"><h4>General Substitution</h4><p>∬f dx dy = ∬f|J| du dv</p><div class="formula">Use |J| in integrals</div></div>
+  </div>
+</div>
+<hr class="theory-divider">
+<div class="theory-block">
+  <h3>7. Change of Variables in Integration</h3>
+  <div class="formula-box">∬_R f(x,y) dx dy = ∬_S f(x(u,v), y(u,v)) · |J| du dv
+
+where J = ∂(x,y)/∂(u,v)</div>
+  <div class="highlight-box"><p><strong>Key rule:</strong> Always use the <strong>absolute value</strong> |J| in integrals — negative Jacobian only means orientation reversal, not a negative area.</p></div>
+</div>
+<hr class="theory-divider">
+<div class="theory-block">
+  <h3>8. Singular Transformation (J = 0)</h3>
+  <div class="degree-examples">
+    <div class="deg-item"><div class="term">J &gt; 0</div><div class="deg">Orientation preserved</div></div>
+    <div class="deg-item"><div class="term">J &lt; 0</div><div class="deg">Orientation reversed</div></div>
+    <div class="deg-item"><div class="term">J = 0</div><div class="deg">Singular — not invertible</div></div>
+  </div>
+</div>
+<hr class="theory-divider">
+<div class="theory-block">
+  <h3>9. Quick Exam Summary</h3>
+  <table class="summary-table">
+    <tr><th>Concept</th><th>Formula</th></tr>
+    <tr><td>2-variable Jacobian</td><td><code>(∂u/∂x)(∂v/∂y) − (∂u/∂y)(∂v/∂x)</code></td></tr>
+    <tr><td>Inverse property</td><td><code>J × J' = 1</code></td></tr>
+    <tr><td>Polar J</td><td><code>J = r</code></td></tr>
+    <tr><td>Cylindrical J</td><td><code>J = r</code></td></tr>
+    <tr><td>Spherical J</td><td><code>J = ρ²·sinφ</code></td></tr>
+    <tr><td>Change of variables</td><td><code>∬f dx dy = ∬f|J| du dv</code></td></tr>
+  </table>
+</div>
+<hr class="theory-divider">
+<div class="theory-block">
+  <h3>10. Conclusion</h3>
+  <div class="highlight-box"><p>The Jacobian is a fundamental tool in multivariable calculus — it generalises the derivative to transformations, and is essential for coordinate changes in integration, physics, and engineering.</p></div>
+</div>
+</template>
+
+<template id="tpl-pretest">
+<div class="marking-scheme-box">
+  <h3><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" fill="currentColor"><path d="M288 376.4l.1 .1-.1 .1V376.4zm-.1-311L225 197.3 79.6 218.1l104.9 102-24.8 144.2L288 395.4V65.5zM288 512c-6.1 0-12.2-1.8-17.4-5.3L158.6 439l-133.6 18c-8.5 1.2-17.1-1.6-23.2-7.6s-9-14.6-7.7-23.1L18.9 278.5 .6 248.3c-4.1-7.4-4.9-16.1-2.3-24.2s8.5-14.7 16.4-17.9l141-47L264.5 27.1c5.5-10 16-16.5 27.6-16.5h0c11.6 0 22.1 6.5 27.6 16.5l108 132.1 141 47c7.9 3.2 14 9.8 16.4 17.9s1.7 16.8-2.3 24.2L561 278.5l24.8 147.7c1.3 8.5-1.5 17.1-7.7 23.1s-14.7 8.8-23.2 7.6L421.4 439 309.4 506.7c-5.2 3.5-11.3 5.3-17.4 5.3h-4z"/></svg></span></i> Marking Scheme</h3>
+  <div class="mark-rule"><span class="mark-badge green">+1 Mark</span><p>Correct answer on attempt 1, 2, or 3 <strong>without</strong> a hint.</p></div>
+  <div class="mark-rule"><span class="mark-badge orange">0 Marks</span><p>Correct answer <strong>after</strong> taking a hint — "Congratulations!" shown, no mark awarded.</p></div>
+  <div class="mark-rule"><span class="mark-badge red">0 Marks</span><p>All 3 attempts used, hint declined or still wrong after hint.</p></div>
+</div>
+<div class="quiz-score" id="pre-score" style="display:none;"></div>
+<div id="pretest-container"></div>
+</template>
+
+<template id="tpl-simulation">
+<div class="sim-wrap">
+  <div style="display:flex;gap:10px;margin-bottom:8px;flex-wrap:wrap;">
+    <button class="sim-btn" id="sim-verify-btn" onclick="simTab('verify')" style="padding:8px 18px;font-size:13px;">Compute Jacobian 2×2</button>
+    <button class="sim-btn" id="sim-partial-btn" onclick="simTab('partial')" style="padding:8px 18px;font-size:13px;background:linear-gradient(to right,#7f8c8d,#555);">Compute Jacobian 3×3</button>
+  </div>
+  <div id="sim-verify">
+    <div class="examples-row">
+      <span>Examples (u,v):</span>
+      <button class="ex-btn" onclick="loadJac2('x^2 - y^2','2*x*y')">u=x²−y², v=2xy</button>
+      <button class="ex-btn" onclick="loadJac2('x*y','x+y')">u=xy, v=x+y</button>
+      <button class="ex-btn" onclick="loadJac2('Math.sqrt(x*x+y*y)','Math.atan2(y,x)')">u=r, v=θ</button>
+      <button class="ex-btn" onclick="loadJac2('x^2+y','x-y^2')">u=x²+y, v=x−y²</button>
+    </div>
+    <div class="sim-controls">
+      <div class="sim-field">
+        <label>u(x, y) =</label>
+        <input type="text" id="v-fn" placeholder="e.g. x^2 - y^2">
+        <div class="sim-hint">Use x, y | Ops: + – * ^ / | sqrt(), Math.atan2(y,x)</div>
+      </div>
+      <div class="sim-field">
+        <label>v(x, y) =</label>
+        <input type="text" id="v-deg" placeholder="e.g. 2*x*y">
+      </div>
+    </div>
+    <button class="sim-btn" onclick="runVerify()"><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" fill="currentColor"><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg></span></i> Compute J (2×2)</button>
+    <div class="result-box" id="verify-result"></div>
+  </div>
+  <div id="sim-partial" style="display:none;">
+    <div class="examples-row">
+      <span>Examples (u,v,w):</span>
+      <button class="ex-btn" onclick="loadJac3('x*y*z','x^2+y','y^2+z')">u=xyz,v=x²+y,w=y²+z</button>
+      <button class="ex-btn" onclick="loadJac3('x+y','y+z','x+z')">u=x+y,v=y+z,w=x+z</button>
+      <button class="ex-btn" onclick="loadJac3('x^2','y^2','z^2')">u=x²,v=y²,w=z²</button>
+    </div>
+    <div class="sim-controls">
+      <div class="sim-field">
+        <label>u(x,y,z) =</label>
+        <input type="text" id="p-fn" placeholder="e.g. x*y*z">
+        <div class="sim-hint">Use x, y, z | Ops: + – * ^ / | sqrt()</div>
+      </div>
+      <div class="sim-field">
+        <label>v(x,y,z) =</label>
+        <input type="text" id="p-fn2" placeholder="e.g. x^2 + y">
+      </div>
+      <div class="sim-field">
+        <label>w(x,y,z) =</label>
+        <input type="text" id="p-fn3" placeholder="e.g. y^2 + z">
+      </div>
+    </div>
+    <button class="sim-btn" onclick="runPartial()"><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" fill="currentColor"><path d="M64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V64c0-35.3-28.7-64-64-64H64zm96 64h64c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H160c-8.8 0-16-7.2-16-16V80c0-8.8 7.2-16 16-16zM96 240c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H112c-8.8 0-16-7.2-16-16V240zm16 80h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H112c-8.8 0-16-7.2-16-16V336c0-8.8 7.2-16 16-16zm80-80c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H208c-8.8 0-16-7.2-16-16V240zm16 80h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H208c-8.8 0-16-7.2-16-16V336c0-8.8 7.2-16 16-16zm80-80c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v96c0 8.8-7.2 16-16 16H288c-8.8 0-16-7.2-16-16V240zm0 160h32c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16H288c-8.8 0-16-7.2-16-16V416c0-8.8 7.2-16 16-16z"/></svg></span></i> Compute J (3×3)</button>
+    <div class="result-box" id="partial-result"></div>
+  </div>
+</div>
+</template>
+
+<template id="tpl-posttest">
+<div class="marking-scheme-box">
+  <h3><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" fill="currentColor"><path d="M288 376.4l.1 .1-.1 .1V376.4zm-.1-311L225 197.3 79.6 218.1l104.9 102-24.8 144.2L288 395.4V65.5zM288 512c-6.1 0-12.2-1.8-17.4-5.3L158.6 439l-133.6 18c-8.5 1.2-17.1-1.6-23.2-7.6s-9-14.6-7.7-23.1L18.9 278.5 .6 248.3c-4.1-7.4-4.9-16.1-2.3-24.2s8.5-14.7 16.4-17.9l141-47L264.5 27.1c5.5-10 16-16.5 27.6-16.5h0c11.6 0 22.1 6.5 27.6 16.5l108 132.1 141 47c7.9 3.2 14 9.8 16.4 17.9s1.7 16.8-2.3 24.2L561 278.5l24.8 147.7c1.3 8.5-1.5 17.1-7.7 23.1s-14.7 8.8-23.2 7.6L421.4 439 309.4 506.7c-5.2 3.5-11.3 5.3-17.4 5.3h-4z"/></svg></span></i> Marking Scheme</h3>
+  <div class="mark-rule"><span class="mark-badge green">+1 Mark</span><p>Correct answer on attempt 1, 2, or 3 <strong>without</strong> a hint.</p></div>
+  <div class="mark-rule"><span class="mark-badge orange">0 Marks</span><p>Correct answer <strong>after</strong> taking a hint — "Congratulations!" shown, no mark awarded.</p></div>
+  <div class="mark-rule"><span class="mark-badge red">0 Marks</span><p>All 3 attempts used, hint declined or still wrong after hint.</p></div>
+</div>
+<div class="quiz-score" id="post-score" style="display:none;"></div>
+<div id="posttest-container"></div>
+</template>
+
+<template id="tpl-references">
+<ul class="ref-list">
+  <li><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor"><path d="M96 0C43 0 0 43 0 96V416c0 53 43 96 96 96H384h32c17.7 0 32-14.3 32-32s-14.3-32-32-32V384c17.7 0 32-14.3 32-32V32c0-17.7-14.3-32-32-32H384 96zm0 384H352v64H96c-17.7 0-32-14.3-32-32s14.3-32 32-32zm32-240c0-8.8 7.2-16 16-16H336c8.8 0 16 7.2 16 16s-7.2 16-16 16H144c-8.8 0-16-7.2-16-16zm16 48H336c8.8 0 16 7.2 16 16s-7.2 16-16 16H144c-8.8 0-16-7.2-16-16s7.2-16 16-16z"/></svg></span></i><div><strong>Higher Engineering Mathematics</strong> — B. S. Grewal, Khanna Publishers.<br><span style="font-size:12px;color:#7f8c8d;">Chapter on Jacobians and Transformations.</span></div></li>
+  <li><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor"><path d="M96 0C43 0 0 43 0 96V416c0 53 43 96 96 96H384h32c17.7 0 32-14.3 32-32s-14.3-32-32-32V384c17.7 0 32-14.3 32-32V32c0-17.7-14.3-32-32-32H384 96zm0 384H352v64H96c-17.7 0-32-14.3-32-32s14.3-32 32-32zm32-240c0-8.8 7.2-16 16-16H336c8.8 0 16 7.2 16 16s-7.2 16-16 16H144c-8.8 0-16-7.2-16-16zm16 48H336c8.8 0 16 7.2 16 16s-7.2 16-16 16H144c-8.8 0-16-7.2-16-16s7.2-16 16-16z"/></svg></span></i><div><strong>Advanced Engineering Mathematics</strong> — Erwin Kreyszig, Wiley.<br><span style="font-size:12px;color:#7f8c8d;">Jacobian Determinants, Coordinate Transformations, and Multiple Integrals.</span></div></li>
+  <li><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor"><path d="M96 0C43 0 0 43 0 96V416c0 53 43 96 96 96H384h32c17.7 0 32-14.3 32-32s-14.3-32-32-32V384c17.7 0 32-14.3 32-32V32c0-17.7-14.3-32-32-32H384 96zm0 384H352v64H96c-17.7 0-32-14.3-32-32s14.3-32 32-32zm32-240c0-8.8 7.2-16 16-16H336c8.8 0 16 7.2 16 16s-7.2 16-16 16H144c-8.8 0-16-7.2-16-16zm16 48H336c8.8 0 16 7.2 16 16s-7.2 16-16 16H144c-8.8 0-16-7.2-16-16s7.2-16 16-16z"/></svg></span></i><div><strong>Calculus: Early Transcendentals</strong> — James Stewart, Cengage.<br><span style="font-size:12px;color:#7f8c8d;">Multivariable Calculus — Jacobians and Change of Variables.</span></div></li>
+  <li><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M352 256c0 22.2-1.2 43.6-3.3 64H163.3c-2.2-20.4-3.3-41.8-3.3-64s1.2-43.6 3.3-64H348.7c2.2 20.4 3.3 41.8 3.3 64zm28.8-64H503.9c5.3 20.5 8.1 41.9 8.1 64s-2.8 43.5-8.1 64H380.8c2.1-20.6 3.2-42 3.2-64s-1.1-43.4-3.2-64zm112.6-32H376.7c-10-63.9-29.8-117.4-55.3-151.6c78.3 20.7 142 77.5 171.9 151.6zm-149.1 0H167.7c6.1-36.4 15.5-68.6 27-94.7c10.5-23.6 22.2-40.7 33.5-51.5C239.4 3.2 248.7 0 256 0s16.6 3.2 27.8 13.8c11.3 10.8 23 27.9 33.5 51.5c11.5 26 20.9 58.2 27 94.7zm-209 0H18.6C48.6 85.9 112.2 29.1 190.6 8.4C165.1 42.6 145.3 96.1 135.3 160zM8.1 192H131.2c-2.1 20.6-3.2 42-3.2 64s1.1 43.4 3.2 64H8.1C2.8 299.5 0 278.1 0 256s2.8-43.5 8.1-64zM194.7 446.6c-11.5-26-20.9-58.2-27-94.6H344.3c-6.1 36.4-15.5 68.6-27 94.6c-10.5 23.6-22.2 40.7-33.5 51.5C272.6 508.8 263.3 512 256 512s-16.6-3.2-27.8-13.8c-11.3-10.8-23-27.9-33.5-51.5zM135.3 352c10 63.9 29.8 117.4 55.3 151.6C112.2 482.9 48.6 426.1 18.6 352H135.3zm358.1 0c-30 74.1-93.6 130.9-171.9 151.6c25.5-34.2 45.2-87.7 55.3-151.6H493.4z"/></svg></span></i><div><strong>NPTEL — Engineering Mathematics</strong><br><a href="https://nptel.ac.in" target="_blank">https://nptel.ac.in</a></div></li>
+  <li><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M352 256c0 22.2-1.2 43.6-3.3 64H163.3c-2.2-20.4-3.3-41.8-3.3-64s1.2-43.6 3.3-64H348.7c2.2 20.4 3.3 41.8 3.3 64zm28.8-64H503.9c5.3 20.5 8.1 41.9 8.1 64s-2.8 43.5-8.1 64H380.8c2.1-20.6 3.2-42 3.2-64s-1.1-43.4-3.2-64zm112.6-32H376.7c-10-63.9-29.8-117.4-55.3-151.6c78.3 20.7 142 77.5 171.9 151.6zm-149.1 0H167.7c6.1-36.4 15.5-68.6 27-94.7c10.5-23.6 22.2-40.7 33.5-51.5C239.4 3.2 248.7 0 256 0s16.6 3.2 27.8 13.8c11.3 10.8 23 27.9 33.5 51.5c11.5 26 20.9 58.2 27 94.7zm-209 0H18.6C48.6 85.9 112.2 29.1 190.6 8.4C165.1 42.6 145.3 96.1 135.3 160zM8.1 192H131.2c-2.1 20.6-3.2 42-3.2 64s1.1 43.4 3.2 64H8.1C2.8 299.5 0 278.1 0 256s2.8-43.5 8.1-64zM194.7 446.6c-11.5-26-20.9-58.2-27-94.6H344.3c-6.1 36.4-15.5 68.6-27 94.6c-10.5 23.6-22.2 40.7-33.5 51.5C272.6 508.8 263.3 512 256 512s-16.6-3.2-27.8-13.8c-11.3-10.8-23-27.9-33.5-51.5zM135.3 352c10 63.9 29.8 117.4 55.3 151.6C112.2 482.9 48.6 426.1 18.6 352H135.3zm358.1 0c-30 74.1-93.6 130.9-171.9 151.6c25.5-34.2 45.2-87.7 55.3-151.6H493.4z"/></svg></span></i><div><strong>Khan Academy — Multivariable Calculus</strong><br><a href="https://www.khanacademy.org/math/multivariable-calculus" target="_blank">khanacademy.org/math/multivariable-calculus</a></div></li>
+</ul>
+</template>
+
+<template id="tpl-contributors">
+<div style="margin-bottom:22px;">
+  <h3 style="color:#2c3e50;font-size:16px;margin-bottom:12px;"><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;color:#3498db;margin-right:8px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" fill="currentColor"><path d="M392.8 1.2c-17-4.9-34.7 5-39.6 22l-128 448c-4.9 17 5 34.7 22 39.6s34.7-5 39.6-22l128-448c4.9-17-5-34.7-22-39.6zm80.6 120.1c-12.5 12.5-12.5 32.8 0 45.3L562.7 256l-89.4 89.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l112-112c12.5-12.5 12.5-32.8 0-45.3l-112-112c-12.5-12.5-32.8-12.5-45.3 0zm-306.7 0c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3l112 112c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256l89.4-89.4c12.5-12.5 12.5-32.8 0-45.3z"/></svg></span></i>Developers</h3>
+  <div class="contrib-grid">
+    <div class="contrib-card"><div class="contrib-avatar">SV</div><h4>Shivendra Varute</h4><p>Developer</p><p style="font-size:11px;color:#3498db;margin-top:4px;">Applied Sciences Dept.</p><p style="font-size:11px;color:#7f8c8d;margin-top:2px;">shivendra.varute25@pccoepune.org</p></div>
+    <div class="contrib-card"><div class="contrib-avatar">AB</div><h4>Anushk Bandre</h4><p>Developer</p><p style="font-size:11px;color:#3498db;margin-top:4px;">Applied Sciences Dept.</p><p style="font-size:11px;color:#7f8c8d;margin-top:2px;">anushk.bandre25@pccoepune.org</p></div>
+    <div class="contrib-card"><div class="contrib-avatar">AM</div><h4>Aakanksh Muley</h4><p>Developer</p><p style="font-size:11px;color:#3498db;margin-top:4px;">Applied Sciences Dept.</p><p style="font-size:11px;color:#7f8c8d;margin-top:2px;">aakanksh.muley25@pccoepune.org</p></div>
+  </div>
+</div>
+<div>
+  <h3 style="color:#2c3e50;font-size:16px;margin-bottom:12px;"><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;color:#f39c12;margin-right:8px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" fill="currentColor"><path d="M160 64c0-35.3 28.7-64 64-64H576c35.3 0 64 28.7 64 64V352c0 35.3-28.7 64-64 64H336.8c-11.8-25.5-29.9-47.5-52.4-64H384V320c0-17.7 14.3-32 32-32h64c17.7 0 32 14.3 32 32v32h64V64L224 64v49.1C214.2 102.7 197.3 96 179.2 96c-6.5 0-12.8 .8-18.8 2.2c-.2-1.4-.4-2.8-.4-4.3V64zM0 288c0-53 43-96 96-96s96 43 96 96s-43 96-96 96s-96-43-96-96zM320 480c0 32-32 32-32 32H32s-32 0-32-32c0-32 32-128 96-128s80 32 128 32s32-32 96-32c53 0 96 43 96 128z"/></svg></span></i>Guide</h3>
+  <div class="contrib-grid" style="grid-template-columns:minmax(190px,300px);">
+    <div class="contrib-card" style="border-top:3px solid #f39c12;">
+      <div class="contrib-avatar" style="background:linear-gradient(135deg,#f39c12,#e67e22);">GT</div>
+      <h4>Prof. Ganesh Tarte</h4><p>Project Guide</p>
+      <p style="font-size:11px;color:#f39c12;margin-top:4px;">Applied Sciences &amp; Humanities Dept.</p>
+      <p style="font-size:11px;color:#7f8c8d;margin-top:2px;">Pimpri Chinchwad College of Engineering</p>
+    </div>
+  </div>
+</div>
+</template>
+
+<template id="tpl-feedback">
+<div class="feedback-form">
+  <div style="background:#f0f7ff;border-left:4px solid #3498db;border-radius:8px;padding:12px 16px;margin-bottom:18px;font-size:13px;color:#2c3e50;">
+    <span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;color:#3498db;margin-right:8px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M48 64C21.5 64 0 85.5 0 112c0 15.1 7.1 29.3 19.2 38.4L236.8 313.6c11.4 8.5 27 8.5 38.4 0L492.8 150.4c12.1-9.1 19.2-23.3 19.2-38.4c0-26.5-21.5-48-48-48H48zM0 176V384c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V176L294.4 339.2c-22.8 17.1-54 17.1-76.8 0L0 176z"/></svg></span></i>
+    Feedback is sent to <strong>shivendra.varute25@pccoepune.org</strong>, <strong>anushk.bandre25@pccoepune.org</strong> &amp; <strong>aakanksh.muley25@pccoepune.org</strong>.
+  </div>
+  <div class="fb-field"><label>Your Name</label><input type="text" id="fb-name" placeholder="Enter your name"></div>
+  <div class="fb-field"><label>Your Roll Number</label><input type="text" id="fb-roll" placeholder="e.g. 22CS101"></div>
+  <div class="fb-field">
+    <label>Rate this experiment</label>
+    <div class="star-row" id="stars">
+      <span class="star" data-v="1">&#9733;</span><span class="star" data-v="2">&#9733;</span>
+      <span class="star" data-v="3">&#9733;</span><span class="star" data-v="4">&#9733;</span>
+      <span class="star" data-v="5">&#9733;</span>
+    </div>
+  </div>
+  <div class="fb-field">
+    <label>How clear was the theory?</label>
+    <select id="fb-clarity">
+      <option value="">— Select —</option>
+      <option>Very clear</option><option>Clear</option>
+      <option>Somewhat clear</option><option>Confusing</option>
+    </select>
+  </div>
+  <div class="fb-field"><label>Comments / Suggestions</label><textarea id="fb-comments" placeholder="Share your experience..."></textarea></div>
+  <button class="fb-submit" onclick="submitFeedback()"><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M498.1 5.6c10.1 7 15.4 19.1 13.5 31.2l-64 416c-1.5 9.7-7.4 18.2-16 23s-18.9 5.4-28 1.6L284 427.7l-68.5 74.1c-8.9 9.7-22.9 12.9-35.2 8.1S160 493.2 160 480V396.4c0-4 1.5-7.8 4.2-10.7L331.8 202.8c5.8-6.3 5.6-16-.4-22s-15.7-6.4-22-.7L106 360.8 17.7 316.6C7.1 311.3 .3 300.7 0 288.9s5.9-22.8 16.1-28.7l448-256c10.7-6.1 23.9-5.5 34 1.4z"/></svg></span></i> &nbsp;Send Feedback</button>
+  <div class="fb-success" id="fb-success"><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"/></svg></span></i> &nbsp;Your email client will open — click Send to deliver feedback to the team.</div>
+</div>
+</template>
+
+<script>
+// ══════════ AUTH ══════════
+function getUsers(){try{return JSON.parse(localStorage.getItem('vlab_users')||'{}');}catch(e){return{};}}
+function saveUsers(u){localStorage.setItem('vlab_users',JSON.stringify(u));}
+function getCurrentUser(){try{return JSON.parse(localStorage.getItem('vlab_current')||'null');}catch(e){return null;}}
+function setCurrentUser(u){if(u)localStorage.setItem('vlab_current',JSON.stringify(u));else localStorage.removeItem('vlab_current');}
+function getUserProgress(roll){try{return JSON.parse(localStorage.getItem('vlab_prog_'+roll)||'{}');}catch(e){return{};}}
+function saveUserProgress(roll,d){localStorage.setItem('vlab_prog_'+roll,JSON.stringify(d));}
+
+let currentUser=getCurrentUser();
+
+function renderHeader(){
+  const hr=document.getElementById('headerRight');
+  if(currentUser){
+    const ini=currentUser.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    hr.innerHTML=`
+      <div class="user-chip" onclick="toggleDD()">
+        <div class="user-avatar">${ini}</div>
+        <span class="uname">${currentUser.name.split(' ')[0]}</span>
+        <span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;width:11px;height:11px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"/></svg></span></i>
+      </div>
+      <div class="user-dropdown" id="userDD">
+        <a onclick="openDashboard()"><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M32 32c17.7 0 32 14.3 32 32V400c0 8.8 7.2 16 16 16H480c17.7 0 32 14.3 32 32s-14.3 32-32 32H80c-44.2 0-80-35.8-80-80V64C0 46.3 14.3 32 32 32zm96 96c0-17.7 14.3-32 32-32l192 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-192 0c-17.7 0-32-14.3-32-32zm32 64H288c17.7 0 32 14.3 32 32s-14.3 32-32 32H160c-17.7 0-32-14.3-32-32s14.3-32 32-32zm0 96h96c17.7 0 32 14.3 32 32s-14.3 32-32 32H160c-17.7 0-32-14.3-32-32s14.3-32 32-32z"/></svg></span></i> My Dashboard</a>
+        <hr>
+        <a onclick="doLogout()" class="logout"><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M502.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L402.7 224 192 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l210.7 0-73.4 73.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l128-128zM160 96c17.7 0 32-14.3 32-32s-14.3-32-32-32H96C43 32 0 75 0 128L0 384c0 53 43 96 96 96h64c17.7 0 32-14.3 32-32s-14.3-32-32-32H96c-17.7 0-32-14.3-32-32l0-256c0-17.7 14.3-32 32-32h64z"/></svg></span></i> Sign Out</a>
+      </div>`;
+  } else {
+    hr.innerHTML=`
+      <button class="auth-btn btn-login" onclick="openAuth('login')">Sign In</button>
+      <button class="auth-btn btn-signup" onclick="openAuth('signup')">Sign Up</button>`;
+  }
+  updateAllStatuses();
+}
+
+function toggleDD(){const dd=document.getElementById('userDD');if(dd)dd.classList.toggle('open');}
+document.addEventListener('click',e=>{
+  const dd=document.getElementById('userDD');
+  if(dd&&!e.target.closest('.user-chip')&&!e.target.closest('.user-dropdown'))dd.classList.remove('open');
+});
+
+function openAuth(tab){document.getElementById('authModal').classList.add('open');switchTab(tab);}
+function closeAuth(){document.getElementById('authModal').classList.remove('open');}
+function switchTab(tab){
+  ['login','signup'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
+    document.getElementById('form-'+t).classList.toggle('active',t===tab);
+  });
+}
+function se(id,show){document.getElementById(id).style.display=show?'block':'none';}
+
+function doLogin(){
+  const id=document.getElementById('login-id').value.trim().toLowerCase();
+  const pw=document.getElementById('login-pass').value;
+  const u=getUsers()[id];
+  if(!u||u.password!==pw){se('login-err',true);return;}
+  se('login-err',false);
+  currentUser={name:u.name,roll:u.roll};
+  setCurrentUser(currentUser);closeAuth();renderHeader();
+}
+
+function doSignup(){
+  const name=document.getElementById('su-name').value.trim();
+  const roll=document.getElementById('su-roll').value.trim();
+  const pw=document.getElementById('su-pass').value;
+  const pw2=document.getElementById('su-pass2').value;
+  let ok=true;
+  if(!name){se('su-name-err',true);ok=false;}else se('su-name-err',false);
+  if(!roll){se('su-roll-err',true);ok=false;}else se('su-roll-err',false);
+  if(pw.length<6){se('su-pass-err',true);ok=false;}else se('su-pass-err',false);
+  if(pw!==pw2){se('su-pass2-err',true);ok=false;}else se('su-pass2-err',false);
+  if(!ok)return;
+  const users=getUsers();
+  users[roll.toLowerCase()]={name,roll,password:pw};
+  saveUsers(users);
+  currentUser={name,roll};setCurrentUser(currentUser);closeAuth();renderHeader();
+}
+
+function doLogout(){currentUser=null;setCurrentUser(null);renderHeader();}
+
+// ══════════ PROGRESS ══════════
+const allSections=['aim','theory','pretest','simulation','posttest','references','contributors','feedback'];
+const sLabels={aim:'Aim',theory:'Theory',pretest:'Pretest',simulation:'Simulation',posttest:'Posttest',references:'References',contributors:'Contributors',feedback:'Feedback'};
+const sIcons={aim:'fa-bullseye',theory:'fa-book',pretest:'fa-question-circle',simulation:'fa-desktop',posttest:'fa-clipboard-check',references:'fa-book-open',contributors:'fa-users',feedback:'fa-comment-alt'};
+
+function markVisited(s){
+  if(!currentUser)return;
+  const p=getUserProgress(currentUser.roll);
+  if(!p.visited)p.visited={};
+  p.visited[s]=true;
+  saveUserProgress(currentUser.roll,p);
+  updateAllStatuses();
+}
+function saveScore(s,score,total){
+  if(!currentUser)return;
+  const p=getUserProgress(currentUser.roll);
+  if(!p.scores)p.scores={};
+  p.scores[s]={score,total,date:new Date().toLocaleDateString()};
+  saveUserProgress(currentUser.roll,p);
+}
+function updateAllStatuses(){
+  const p=currentUser?getUserProgress(currentUser.roll):{};
+  allSections.forEach(s=>{
+    const el=document.getElementById('st-'+s);if(!el)return;
+    const v=p.visited&&p.visited[s];
+    const sc=p.scores&&p.scores[s];
+    if(sc){el.textContent=sc.score+'/'+sc.total+' marks';el.className='card-status status-done';}
+    else if(v){el.textContent='Visited';el.className='card-status status-visited';}
+    else{el.textContent='Not Started';el.className='card-status status-not';}
+  });
+}
+
+// ══════════ SECTION MODAL ══════════
+let simVarsV=2,simVarsP=2;
+
+function openSection(name){
+  markVisited(name);
+  document.getElementById('modalTitle').innerHTML=`<i class="fas ${sIcons[name]}"></i> ${sLabels[name]}`;
+  const tpl=document.getElementById('tpl-'+name);
+  document.getElementById('modalBody').innerHTML=tpl?tpl.innerHTML:'<p>Content coming soon.</p>';
+  const modal=document.getElementById('sectionModal');
+  modal.classList.add('open');
+  modal.scrollTop=0;
+  if(name==='pretest'){window._quizState={};buildAssessment(preQuestions,'pre');}
+  if(name==='posttest'){window._quizState={};buildAssessment(postQuestions,'post');}
+  if(name==='feedback')initStars();
+}
+
+function closeSection(){
+  document.getElementById('sectionModal').classList.remove('open');
+}
+
+// Close on backdrop click
+['sectionModal','authModal','dashModal'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
+});
+
+// ══════════ DASHBOARD ══════════
+function openDashboard(){
+  const dd=document.getElementById('userDD');if(dd)dd.classList.remove('open');
+  if(!currentUser)return;
+  const p=getUserProgress(currentUser.roll);
+  const visited=p.visited||{};const scores=p.scores||{};
+  const vc=Object.keys(visited).length;
+  let ts=0,tp=0;
+  if(scores.pretest){ts+=scores.pretest.score;tp+=scores.pretest.total;}
+  if(scores.posttest){ts+=scores.posttest.score;tp+=scores.posttest.total;}
+  let topicsHTML='';
+  allSections.forEach(s=>{
+    const v=visited[s];const sc=scores[s];
+    let pill,status;
+    if(sc){pill='pill-done';status=sc.score+'/'+sc.total+' marks';}
+    else if(v){pill='pill-visited';status='Visited';}
+    else{pill='pill-not';status='Not started';}
+    topicsHTML+=`<li><span><i class="fas ${sIcons[s]}" style="color:#3498db;margin-right:6px;font-size:12px;"></i>${sLabels[s]}</span><span class="pill ${pill}">${status}</span></li>`;
+  });
+  document.getElementById('dashBody').innerHTML=`
+    <p style="margin-bottom:6px;color:#7f8c8d;font-size:14px;">Welcome, <strong style="color:#2c3e50;">${currentUser.name}</strong> &nbsp;·&nbsp; Roll: ${currentUser.roll}</p>
+    <div class="dash-grid" style="margin-top:16px;">
+      <div class="dash-card">
+        <h4><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M152.1 38.2c9.9 8.9 10.7 24 1.8 33.9l-72 80c-4.4 4.9-10.6 7.8-17.2 7.9s-12.9-2.4-17.6-7L7 113C-2.3 103.6-2.3 88.4 7 79s24.6-9.4 33.9 0l22.1 22.1 55.1-61.2c8.9-9.9 24-10.7 33.9-1.8zm0 160c9.9 8.9 10.7 24 1.8 33.9l-72 80c-4.4 4.9-10.6 7.8-17.2 7.9s-12.9-2.4-17.6-7L7 273c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l22.1 22.1 55.1-61.2c8.9-9.9 24-10.7 33.9-1.8zM224 96c0-17.7 14.3-32 32-32H480c17.7 0 32 14.3 32 32s-14.3 32-32 32H256c-17.7 0-32-14.3-32-32zm0 160c0-17.7 14.3-32 32-32H480c17.7 0 32 14.3 32 32s-14.3 32-32 32H256c-17.7 0-32-14.3-32-32zm0 160c0-17.7 14.3-32 32-32H480c17.7 0 32 14.3 32 32s-14.3 32-32 32H256c-17.7 0-32-14.3-32-32z"/></svg></span></i> Progress</h4>
+        <div class="score-big">${vc}<span style="font-size:18px;color:#aaa;font-weight:400;">/${allSections.length}</span></div>
+        <div class="score-label">Sections visited</div>
+        <div class="prog-bar"><div class="prog-bar-fill" style="width:${Math.round(vc/allSections.length*100)}%;"></div></div>
+      </div>
+      <div class="dash-card">
+        <h4><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" fill="currentColor"><path d="M316.9 18C311.6 7 300.4 0 288.1 0s-23.4 7-28.8 18L195 150.3 51.4 171.5c-12 1.8-22 10.2-25.7 21.7s-.7 24.2 7.9 32.7L137.8 329 113.2 474.7c-2 12 3 24.2 12.9 31.3s23 8 33.8 2.3l128.3-68.5 128.3 68.5c10.8 5.7 23.9 4.9 33.8-2.3s14.9-19.3 12.9-31.3L438.5 329 542.7 225.9c8.6-8.5 11.7-21.2 7.9-32.7s-13.7-19.9-25.7-21.7L381.2 150.3 316.9 18z"/></svg></span></i> Assessment Scores</h4>
+        <div class="score-row">
+          <div class="score-box blue"><div class="val">${scores.pretest?scores.pretest.score+'/'+scores.pretest.total:'—'}</div><div class="lbl">Pretest</div></div>
+          <div class="score-box green"><div class="val">${scores.posttest?scores.posttest.score+'/'+scores.posttest.total:'—'}</div><div class="lbl">Posttest</div></div>
+        </div>
+        ${tp>0?`<div style="margin-top:12px;font-size:13px;color:#555;">Combined: <strong>${ts}/${tp}</strong> marks (${Math.round(ts/tp*100)}%)</div>`:'<div style="margin-top:12px;font-size:12px;color:#aaa;">Complete Pretest and Posttest to see combined score.</div>'}
+      </div>
+    </div>
+    <div class="dash-card">
+      <h4><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M152.1 38.2c9.9 8.9 10.7 24 1.8 33.9l-72 80c-4.4 4.9-10.6 7.8-17.2 7.9s-12.9-2.4-17.6-7L7 113C-2.3 103.6-2.3 88.4 7 79s24.6-9.4 33.9 0l22.1 22.1 55.1-61.2c8.9-9.9 24-10.7 33.9-1.8zm0 160c9.9 8.9 10.7 24 1.8 33.9l-72 80c-4.4 4.9-10.6 7.8-17.2 7.9s-12.9-2.4-17.6-7L7 273c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l22.1 22.1 55.1-61.2c8.9-9.9 24-10.7 33.9-1.8zm0 160c9.9 8.9 10.7 24 1.8 33.9l-72 80c-4.4 4.9-10.6 7.8-17.2 7.9s-12.9-2.4-17.6-7L7 433c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l22.1 22.1 55.1-61.2c8.9-9.9 24-10.7 33.9-1.8zM224 128c0-17.7 14.3-32 32-32H480c17.7 0 32 14.3 32 32s-14.3 32-32 32H256c-17.7 0-32-14.3-32-32zm0 160c0-17.7 14.3-32 32-32H480c17.7 0 32 14.3 32 32s-14.3 32-32 32H256c-17.7 0-32-14.3-32-32zm0 160c0-17.7 14.3-32 32-32H480c17.7 0 32 14.3 32 32s-14.3 32-32 32H256c-17.7 0-32-14.3-32-32z"/></svg></span></i> Topic Status</h4>
+      <ul class="progress-list">${topicsHTML}</ul>
+    </div>`;
+  document.getElementById('dashModal').classList.add('open');
+}
+
+// ══════════ QUIZ DATA ══════════
+const preQuestions=[
+  {q:"The Jacobian J = ∂(u,v)/∂(x,y) is defined as:",opts:["(∂u/∂x)(∂v/∂y) − (∂u/∂y)(∂v/∂x)","(∂u/∂x)(∂v/∂x) − (∂u/∂y)(∂v/∂y)","∂u/∂x + ∂v/∂y","(∂u/∂x + ∂u/∂y)(∂v/∂x + ∂v/∂y)"],ans:0,hint:"The Jacobian is the determinant of the 2×2 matrix of partial derivatives. Expand along the diagonal: (row1col1)(row2col2) − (row1col2)(row2col1).",hintFormula:"J = (∂u/∂x)(∂v/∂y) − (∂u/∂y)(∂v/∂x)"},
+  {q:"If u = x² + y and v = x − y², then ∂u/∂x = ?",opts:["2x","x","1","2y"],ans:0,hint:"Differentiate u = x² + y with respect to x, treating y as constant.",hintFormula:"∂/∂x(x² + y) = 2x (y is treated as constant)"},
+  {q:"For the polar transformation x = r·cosθ, y = r·sinθ, the Jacobian ∂(x,y)/∂(r,θ) equals:",opts:["r²","r","sinθ","cosθ"],ans:1,hint:"Compute: (∂x/∂r)(∂y/∂θ) − (∂x/∂θ)(∂y/∂r). Substituting: (cosθ)(r·cosθ) − (−r·sinθ)(sinθ) = r·cos²θ + r·sin²θ = r.",hintFormula:"J = r·cos²θ + r·sin²θ = r(cos²θ + sin²θ) = r"},
+  {q:"If J = ∂(u,v)/∂(x,y) and J' = ∂(x,y)/∂(u,v), then:",opts:["J + J' = 1","J × J' = 1","J − J' = 0","J / J' = 1"],ans:1,hint:"The Jacobian of the inverse transformation is the reciprocal of the original Jacobian.",hintFormula:"J × J' = 1  (provided J ≠ 0)"},
+  {q:"If J = 0 at a point, the transformation is:",opts:["Invertible","Conformal","Singular","Linear"],ans:2,hint:"J = 0 means the transformation collapses area to zero at that point — it cannot be inverted there.",hintFormula:"J = 0  →  the transformation is singular (non-invertible)"}
+];
+const postQuestions=[
+  {q:"For u = x² − y² and v = 2xy, the Jacobian J = ∂(u,v)/∂(x,y) is:",opts:["4xy","4(x²+y²)","4(x²−y²)","2(x+y)"],ans:1,hint:"∂u/∂x=2x, ∂u/∂y=−2y, ∂v/∂x=2y, ∂v/∂y=2x. J=(2x)(2x)−(−2y)(2y)=4x²+4y².",hintFormula:"J = (2x)(2x) − (−2y)(2y) = 4x² + 4y² = 4(x²+y²)"},
+  {q:"The Jacobian for spherical coordinates (ρ,φ,θ) is:",opts:["ρ·sinφ","ρ²","ρ²·sinφ","ρ²·cosφ"],ans:2,hint:"For spherical: x=ρsinφcosθ, y=ρsinφsinθ, z=ρcosφ. Expanding the 3×3 determinant gives ρ²·sinφ.",hintFormula:"J = ρ²·sinφ  (standard result for spherical coordinates)"},
+  {q:"When using the Jacobian in ∬f dx dy = ∬f|J| du dv, we use:",opts:["J exactly","−J","|J| (absolute value)","J²"],ans:2,hint:"We use |J| because area must be positive. A negative J simply indicates orientation reversal, not a negative area.",hintFormula:"|J| ensures the area element is always positive in integration"},
+  {q:"For u = r and v = θ (polar), J = ∂(x,y)/∂(r,θ) = r. What is J' = ∂(r,θ)/∂(x,y)?",opts:["r","r²","1/r","−r"],ans:2,hint:"By the inverse Jacobian property: J × J' = 1. So J' = 1/J = 1/r.",hintFormula:"J × J' = 1  →  J' = 1/J = 1/r"},
+  {q:"For the Jacobian of a 3-variable transformation, the matrix of partial derivatives is:",opts:["2×2","3×2","2×3","3×3"],ans:3,hint:"For three functions u, v, w of three variables x, y, z, there are 3×3 = 9 partial derivatives forming a 3×3 matrix.",hintFormula:"3 functions × 3 variables = 3×3 Jacobian matrix"}
+];
+
+// ══════════ QUIZ ENGINE ══════════
+function buildAssessment(questions,prefix){
+  const c=document.getElementById(prefix+'test-container');if(!c)return;
+  c.innerHTML='';
+  questions.forEach((q,qi)=>{
+    const div=document.createElement('div');div.className='quiz-question';div.id=`${prefix}-q-${qi}`;
+    const dots=[0,1,2].map(i=>`<span class="attempt-dot${i===0?' current':''}" id="${prefix}-dot-${qi}-${i}"></span>`).join('');
+    div.innerHTML=`
+      <p class="q-text">${qi+1}. ${q.q}</p>
+      <div class="attempt-row"><span class="attempt-label">Attempts left:</span><div class="attempt-dots">${dots}</div></div>
+      <ul class="quiz-options" id="${prefix}-opts-${qi}">
+        ${q.opts.map((o,oi)=>`<li id="${prefix}-li-${qi}-${oi}"><label><input type="radio" name="${prefix}q${qi}" value="${oi}" onchange="handleAnswer('${prefix}',${qi},${oi})">${o}</label></li>`).join('')}
+      </ul>
+      <div class="q-feedback" id="${prefix}-fb-${qi}"></div>
+      <div class="hint-prompt-box" id="${prefix}-hint-prompt-${qi}">
+        <p><strong>All 3 attempts used.</strong> Would you like a hint? (Correct after hint = 0 marks)</p>
+        <div class="hbtn-row">
+          <button class="hint-yes" onclick="showHint('${prefix}',${qi})"><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" fill="currentColor"><path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2l0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4l0 0c19.8 27.1 39.7 54.4 49.2 86.3H272zM192 512c44.2 0 80-35.8 80-80V416H112v16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/></svg></span></i> Yes, hint</button>
+          <button class="hint-no" onclick="skipHint('${prefix}',${qi})">No, skip</button>
+        </div>
+      </div>
+      <div class="hint-content-box" id="${prefix}-hint-box-${qi}">
+        <h5><span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" fill="currentColor"><path d="M272 384c9.6-31.9 29.5-59.1 49.2-86.2l0 0c5.2-7.1 10.4-14.2 15.4-21.4c19.8-28.5 31.4-63 31.4-100.3C368 78.8 289.2 0 192 0S16 78.8 16 176c0 37.3 11.6 71.9 31.4 100.3c5 7.2 10.2 14.3 15.4 21.4l0 0c19.8 27.1 39.7 54.4 49.2 86.3H272zM192 512c44.2 0 80-35.8 80-80V416H112v16c0 44.2 35.8 80 80 80zM112 176c0 8.8-7.2 16-16 16s-16-7.2-16-16c0-61.9 50.1-112 112-112c8.8 0 16 7.2 16 16s-7.2 16-16 16c-44.2 0-80 35.8-80 80z"/></svg></span></i> Hint</h5>
+        <p>${q.hint}</p><div class="hf">${q.hintFormula}</div>
+      </div>`;
+    c.appendChild(div);
+  });
+}
+function getState(p,qi){
+  if(!window._quizState)window._quizState={};
+  const k=p+qi;
+  if(!window._quizState[k])window._quizState[k]={attempts:0,hintUsed:false,hintShown:false,done:false,marksAwarded:false};
+  return window._quizState[k];
+}
+function updateDots(p,qi,a){for(let i=0;i<3;i++){const d=document.getElementById(`${p}-dot-${qi}-${i}`);if(!d)continue;d.className='attempt-dot';if(i<a)d.classList.add('used');else if(i===a)d.classList.add('current');}}
+function disableOpts(p,qi){document.querySelectorAll(`input[name="${p}q${qi}"]`).forEach(o=>o.disabled=true);}
+function showFB(p,qi,type,msg){const el=document.getElementById(`${p}-fb-${qi}`);el.className=`q-feedback ${type}`;el.innerHTML=msg;el.style.display='block';}
+
+function handleAnswer(p,qi,sel){
+  const q=(p==='pre'?preQuestions:postQuestions)[qi];
+  const st=getState(p,qi);
+  if(st.done)return;
+  if(st.hintShown&&st.attempts>=3){processAnswer(p,qi,sel,q,st,true);return;}
+  if(st.attempts>=3)return;
+  processAnswer(p,qi,sel,q,st,false);
+}
+function processAnswer(p,qi,sel,q,st,isHint){
+  st.attempts++;updateDots(p,qi,st.attempts);
+  if(sel===q.ans){
+    disableOpts(p,qi);
+    document.getElementById(`${p}-li-${qi}-${sel}`).classList.add('correct');
+    if(st.hintUsed){
+      showFB(p,qi,'correct','🎉 Congratulations! Your answer is correct — but since you used a hint, no marks are awarded.');
+    }else{
+      showFB(p,qi,'correct','🎉 Congratulations! Your answer is correct! <strong>+1 mark awarded.</strong>');
+      st.marksAwarded=true;updateScore(p);
+    }
+    st.done=true;
+  }else{
+    document.getElementById(`${p}-li-${qi}-${sel}`).classList.add('wrong');
+    document.querySelector(`input[name="${p}q${qi}"][value="${sel}"]`).checked=false;
+    if(isHint){
+      disableOpts(p,qi);
+      document.getElementById(`${p}-li-${qi}-${q.ans}`).classList.add('reveal');
+      showFB(p,qi,'neutral','❌ Incorrect again. Correct answer highlighted above.');st.done=true;
+    }else if(st.attempts>=3){
+      disableOpts(p,qi);showFB(p,qi,'neutral','❌ Incorrect. All 3 attempts used.');
+      document.getElementById(`${p}-hint-prompt-${qi}`).style.display='block';
+    }else{
+      const left=3-st.attempts;
+      showFB(p,qi,'wrong',`❌ Incorrect! Try again. <strong>${left} attempt${left>1?'s':''}</strong> left.`);
+      document.querySelectorAll(`input[name="${p}q${qi}"]`).forEach(o=>o.disabled=false);
+      document.getElementById(`${p}-li-${qi}-${sel}`).classList.remove('wrong');
+    }
+  }
+}
+function showHint(p,qi){
+  const st=getState(p,qi);st.hintUsed=true;st.hintShown=true;
+  document.getElementById(`${p}-hint-prompt-${qi}`).style.display='none';
+  document.getElementById(`${p}-hint-box-${qi}`).style.display='block';
+  showFB(p,qi,'info','💡 Hint shown. Try again — correct after hint earns <strong>0 marks</strong>.');
+  document.querySelectorAll(`input[name="${p}q${qi}"]`).forEach(o=>o.disabled=false);
+}
+function skipHint(p,qi){
+  const st=getState(p,qi);st.done=true;
+  const q=(p==='pre'?preQuestions:postQuestions)[qi];
+  document.getElementById(`${p}-hint-prompt-${qi}`).style.display='none';
+  document.getElementById(`${p}-li-${qi}-${q.ans}`).classList.add('reveal');
+  showFB(p,qi,'neutral','No hint taken. Correct answer highlighted above.');
+}
+function updateScore(p){
+  const qs=p==='pre'?preQuestions:postQuestions;
+  const total=qs.length;
+  let score=0;qs.forEach((_,qi)=>{if(getState(p,qi).marksAwarded)score++;});
+  const sc=document.getElementById(p+'-score');
+  if(sc){sc.style.display='block';sc.innerHTML=`<span style="display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;color:#3498db;margin-right:8px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M32 32c17.7 0 32 14.3 32 32V400c0 8.8 7.2 16 16 16H480c17.7 0 32 14.3 32 32s-14.3 32-32 32H80c-44.2 0-80-35.8-80-80V64C0 46.3 14.3 32 32 32zm96 96c0-17.7 14.3-32 32-32l192 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-192 0c-17.7 0-32-14.3-32-32zm32 64H288c17.7 0 32 14.3 32 32s-14.3 32-32 32H160c-17.7 0-32-14.3-32-32s14.3-32 32-32zm0 96h96c17.7 0 32 14.3 32 32s-14.3 32-32 32H160c-17.7 0-32-14.3-32-32s14.3-32 32-32z"/></svg></span></i>Score: <strong>${score}/${total}</strong> (${Math.round(score/total*100)}%)`;}
+  saveScore(p==='pre'?'pretest':'posttest',score,total);
+  updateAllStatuses();
+}
+
+// ══════════ SIMULATION (JACOBIAN) ══════════
+function simTab(t){
+  document.getElementById('sim-verify').style.display=t==='verify'?'block':'none';
+  document.getElementById('sim-partial').style.display=t==='partial'?'block':'none';
+  document.getElementById('sim-verify-btn').style.background=t==='verify'?'linear-gradient(to right,#3498db,#2c80b9)':'linear-gradient(to right,#7f8c8d,#555)';
+  document.getElementById('sim-partial-btn').style.background=t==='partial'?'linear-gradient(to right,#3498db,#2c80b9)':'linear-gradient(to right,#7f8c8d,#555)';
+}
+function loadJac2(u,v){document.getElementById('v-fn').value=u;document.getElementById('v-deg').value=v;document.getElementById('verify-result').style.display='none';}
+function loadJac3(u,v,w){document.getElementById('p-fn').value=u;if(document.getElementById('p-fn2'))document.getElementById('p-fn2').value=v;if(document.getElementById('p-fn3'))document.getElementById('p-fn3').value=w;document.getElementById('partial-result').style.display='none';}
+function fmt(n){if(!isFinite(n))return '<span style="color:#e74c3c">Err</span>';if(Math.abs(n)<1e-8)return '0';return parseFloat(n.toFixed(5)).toString();}
+function pp(e){return e.replace(/\^/g,'**').replace(/sqrt\(/g,'Math.sqrt(');}
+function showR(el,html,t){el.innerHTML=html;el.style.display='block';el.className='result-box '+t;}
+function ef2(e,x,y){try{return Function('x','y','return ('+pp(e)+');')(x,y);}catch(err){return NaN;}}
+function ef3(e,x,y,z){try{return Function('x','y','z','return ('+pp(e)+');')(x,y,z);}catch(err){return NaN;}}
+function nd2(e,v,x,y){const h=1e-6;if(v==='x')return(ef2(e,x+h,y)-ef2(e,x-h,y))/(2*h);return(ef2(e,x,y+h)-ef2(e,x,y-h))/(2*h);}
+function nd3(e,v,x,y,z){const h=1e-6;if(v==='x')return(ef3(e,x+h,y,z)-ef3(e,x-h,y,z))/(2*h);if(v==='y')return(ef3(e,x,y+h,z)-ef3(e,x,y-h,z))/(2*h);return(ef3(e,x,y,z+h)-ef3(e,x,y,z-h))/(2*h);}
+
+function runVerify(){
+  // Jacobian 2x2: J = ∂(u,v)/∂(x,y)
+  const eu=document.getElementById('v-fn').value.trim();
+  const ev=document.getElementById('v-deg').value.trim();
+  const out=document.getElementById('verify-result');
+  if(!eu||!ev){showR(out,'<div style="color:#e74c3c">Please enter both u(x,y) and v(x,y).</div>','error');return;}
+  const pts=[[2,3],[1,4],[3,1],[-1,2]];
+  let rows='';
+  for(const[x,y]of pts){
+    const dux=nd2(eu,'x',x,y),duy=nd2(eu,'y',x,y);
+    const dvx=nd2(ev,'x',x,y),dvy=nd2(ev,'y',x,y);
+    const J=dux*dvy - duy*dvx;
+    rows+=`<tr style="border-top:1px solid #eee;">
+      <td style="padding:7px 10px;font-family:monospace;">(${x},${y})</td>
+      <td style="padding:7px 10px;">${fmt(dux)}</td>
+      <td style="padding:7px 10px;">${fmt(duy)}</td>
+      <td style="padding:7px 10px;">${fmt(dvx)}</td>
+      <td style="padding:7px 10px;">${fmt(dvy)}</td>
+      <td style="padding:7px 10px;font-weight:700;color:${isFinite(J)?(Math.abs(J)<1e-6?'#e74c3c':'#27ae60'):'#e74c3c'};">${fmt(J)}</td>
+    </tr>`;
+  }
+  // Check inverse at first point
+  const[x0,y0]=[2,3];
+  const dux=nd2(eu,'x',x0,y0),duy=nd2(eu,'y',x0,y0),dvx=nd2(ev,'x',x0,y0),dvy=nd2(ev,'y',x0,y0);
+  const J0=dux*dvy-duy*dvx;
+  const Jprime=isFinite(J0)&&Math.abs(J0)>1e-8?1/J0:NaN;
+  let h=`<div class="step-item"><div class="step-label">Functions</div><div class="step-val">u(x,y) = <code>${eu}</code> &nbsp;|&nbsp; v(x,y) = <code>${ev}</code></div></div>`;
+  h+=`<div class="step-item"><div class="step-label">Jacobian Matrix (2×2) at each point</div><div class="step-val">
+    <div style="background:#1a2530;color:#3dd68c;font-family:monospace;padding:12px 16px;border-radius:6px;margin-bottom:12px;font-size:13px;">
+    J = ∂(u,v)/∂(x,y) = | ∂u/∂x  ∂u/∂y |<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| ∂v/∂x  ∂v/∂y |<br><br>
+    = (∂u/∂x)(∂v/∂y) − (∂u/∂y)(∂v/∂x)
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:12px;">
+      <tr style="background:#f8f9fa;font-size:11px;color:#7f8c8d;">
+        <td style="padding:7px 10px;">(x,y)</td>
+        <td style="padding:7px 10px;">∂u/∂x</td>
+        <td style="padding:7px 10px;">∂u/∂y</td>
+        <td style="padding:7px 10px;">∂v/∂x</td>
+        <td style="padding:7px 10px;">∂v/∂y</td>
+        <td style="padding:7px 10px;font-weight:700;">J</td>
+      </tr>${rows}
+    </table>
+  </div></div>`;
+  h+=`<div class="step-item"><div class="step-label">Inverse Jacobian Property at (${x0},${y0})</div><div class="step-val">
+    J = <strong>${fmt(J0)}</strong> &nbsp;|&nbsp; J' = 1/J = <strong>${fmt(Jprime)}</strong><br>
+    J × J' = ${fmt(J0)} × ${fmt(Jprime)} = <strong>${isFinite(J0*Jprime)?fmt(J0*Jprime):'—'}</strong>
+    &nbsp;<span class="${isFinite(J0)&&Math.abs(J0)>1e-8?'badge-ok':'badge-fail'}">${isFinite(J0)&&Math.abs(J0)>1e-8?'✓ J×J\'=1':'✗ Singular (J=0)'}</span>
+  </div></div>`;
+  showR(out,h,'success');
+}
+
+function runPartial(){
+  // Jacobian 3x3: J = ∂(u,v,w)/∂(x,y,z)
+  const eu=document.getElementById('p-fn').value.trim();
+  const ev=document.getElementById('p-fn2')?document.getElementById('p-fn2').value.trim():'';
+  const ew=document.getElementById('p-fn3')?document.getElementById('p-fn3').value.trim():'';
+  const out=document.getElementById('partial-result');
+  if(!eu||!ev||!ew){showR(out,'<div style="color:#e74c3c">Please enter u, v, and w functions.</div>','error');return;}
+  const pts=[[2,3,5],[1,2,1]];
+  let rows='';
+  for(const[x,y,z]of pts){
+    const dux=nd3(eu,'x',x,y,z),duy=nd3(eu,'y',x,y,z),duz=nd3(eu,'z',x,y,z);
+    const dvx=nd3(ev,'x',x,y,z),dvy=nd3(ev,'y',x,y,z),dvz=nd3(ev,'z',x,y,z);
+    const dwx=nd3(ew,'x',x,y,z),dwy=nd3(ew,'y',x,y,z),dwz=nd3(ew,'z',x,y,z);
+    // 3x3 determinant
+    const J=dux*(dvy*dwz-dvz*dwy)-duy*(dvx*dwz-dvz*dwx)+duz*(dvx*dwy-dvy*dwx);
+    rows+=`<tr style="border-top:1px solid #eee;">
+      <td style="padding:7px 10px;font-family:monospace;">(${x},${y},${z})</td>
+      <td style="padding:7px 10px;">${fmt(dux)}</td><td style="padding:7px 10px;">${fmt(duy)}</td><td style="padding:7px 10px;">${fmt(duz)}</td>
+      <td style="padding:7px 10px;">${fmt(dvx)}</td><td style="padding:7px 10px;">${fmt(dvy)}</td><td style="padding:7px 10px;">${fmt(dvz)}</td>
+      <td style="padding:7px 10px;">${fmt(dwx)}</td><td style="padding:7px 10px;">${fmt(dwy)}</td><td style="padding:7px 10px;">${fmt(dwz)}</td>
+      <td style="padding:7px 10px;font-weight:700;color:${isFinite(J)?(Math.abs(J)<1e-6?'#e74c3c':'#27ae60'):'#e74c3c'};">${fmt(J)}</td>
+    </tr>`;
+  }
+  let h=`<div class="step-item"><div class="step-label">Functions</div><div class="step-val">u = <code>${eu}</code> &nbsp;|&nbsp; v = <code>${ev}</code> &nbsp;|&nbsp; w = <code>${ew}</code></div></div>`;
+  h+=`<div class="step-item"><div class="step-label">3×3 Jacobian Matrix Formula</div><div class="step-val">
+    <div style="background:#1a2530;color:#3dd68c;font-family:monospace;padding:12px 16px;border-radius:6px;font-size:12px;">
+    J = ∂(u,v,w)/∂(x,y,z) = | ∂u/∂x  ∂u/∂y  ∂u/∂z |<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| ∂v/∂x  ∂v/∂y  ∂v/∂z |<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| ∂w/∂x  ∂w/∂y  ∂w/∂z |
+    </div>
+  </div></div>`;
+  h+=`<div class="step-item"><div class="step-label">Computed values (partial derivatives + J)</div><div class="step-val">
+    <div style="overflow-x:auto;">
+    <table style="width:100%;border-collapse:collapse;font-size:11px;min-width:600px;">
+      <tr style="background:#f8f9fa;color:#7f8c8d;">
+        <td style="padding:6px 8px;">(x,y,z)</td>
+        <td style="padding:6px 8px;">∂u/∂x</td><td style="padding:6px 8px;">∂u/∂y</td><td style="padding:6px 8px;">∂u/∂z</td>
+        <td style="padding:6px 8px;">∂v/∂x</td><td style="padding:6px 8px;">∂v/∂y</td><td style="padding:6px 8px;">∂v/∂z</td>
+        <td style="padding:6px 8px;">∂w/∂x</td><td style="padding:6px 8px;">∂w/∂y</td><td style="padding:6px 8px;">∂w/∂z</td>
+        <td style="padding:6px 8px;font-weight:700;">J</td>
+      </tr>${rows}
+    </table>
+    </div>
+  </div></div>`;
+  showR(out,h,'info');
+}
+
+// ══════════ FEEDBACK STARS ══════════
+let starRating=0;
+function initStars(){
+  starRating=0;
+  setTimeout(()=>{
+    document.querySelectorAll('.star').forEach(s=>{
+      s.addEventListener('mouseenter',()=>{const v=parseInt(s.dataset.v);document.querySelectorAll('.star').forEach(x=>x.classList.toggle('lit',parseInt(x.dataset.v)<=v));});
+      s.addEventListener('mouseleave',()=>{document.querySelectorAll('.star').forEach(x=>x.classList.toggle('lit',parseInt(x.dataset.v)<=starRating));});
+      s.addEventListener('click',()=>{starRating=parseInt(s.dataset.v);document.querySelectorAll('.star').forEach(x=>x.classList.toggle('lit',parseInt(x.dataset.v)<=starRating));});
+    });
+  },50);
+}
+function submitFeedback(){
+  const name=document.getElementById('fb-name').value.trim();
+  const roll=document.getElementById('fb-roll').value.trim();
+  const clarity=document.getElementById('fb-clarity').value;
+  const comments=document.getElementById('fb-comments').value.trim();
+  const stars=starRating>0?'★'.repeat(starRating)+'☆'.repeat(5-starRating):'Not rated';
+  if(!name){alert('Please enter your name before submitting.');return;}
+  const to='shivendra.varute25@pccoepune.org,anushk.bandre25@pccoepune.org,aakanksh.muley25@pccoepune.org';
+  const subject=encodeURIComponent("Virtual Lab Feedback – Jacobian");
+  const body=encodeURIComponent(
+    "Virtual Lab Feedback — Jacobian\n==========================================\n\n"+
+    'Student Name  : '+name+'\nRoll Number   : '+(roll||'Not provided')+
+    '\nRating        : '+stars+' ('+starRating+'/5)'+
+    '\nTheory Clarity: '+(clarity||'Not selected')+
+    '\n\nComments:\n'+(comments||'(None)')+'\n\n--\nSent from Virtual Labs – PCCE'
+  );
+  window.location.href='mailto:'+to+'?subject='+subject+'&body='+body;
+  document.getElementById('fb-success').style.display='block';
+  document.querySelector('.fb-submit').disabled=true;
+}
+
+// ══════════ INIT ══════════
+renderHeader();
+</script>
+</body>
+</html>
